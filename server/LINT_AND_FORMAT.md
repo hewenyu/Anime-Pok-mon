@@ -5,10 +5,12 @@ This project uses ESLint for code linting and Prettier for code formatting to ma
 ## Available Scripts
 
 ### Linting
+
 - `npm run lint` - Check all files for linting issues
 - `npm run lint:fix` - Automatically fix linting issues where possible
 
 ### Formatting
+
 - `npm run format` - Format all files using Prettier
 - `npm run format:check` - Check if files are properly formatted (without modifying)
 
@@ -44,6 +46,7 @@ npm run format
 ## Configuration Details
 
 ### ESLint Rules
+
 - TypeScript strict mode enabled
 - React hooks and JSX support
 - Prettier integration for formatting
@@ -51,6 +54,7 @@ npm run format
 - Unused variables with underscore prefix ignored
 
 ### Prettier Rules
+
 - Single quotes preferred
 - 2-space indentation
 - 80 character line width
