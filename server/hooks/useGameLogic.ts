@@ -98,6 +98,7 @@ export const useGameLogic = () => {
     'INITIAL_PROFILE_PREPARATION'
   );
   const [isLoadingFromSave, setIsLoadingFromSave] = useState<boolean>(false);
+  const [hasAttemptedInitialLoad, setHasAttemptedInitialLoad] = useState<boolean>(false);
 
   const advanceGameTimeInternal = (
     currentTs: number,
@@ -1878,12 +1879,14 @@ export const useGameLogic = () => {
     // 3. AI is not currently loading
     // 4. We're not loading from a saved state
     // 5. There's no existing current AI scene (to avoid overriding loaded content)
+    // 6. We have attempted initial load (prevents early triggering)
     if (
       gameState.gameMode === GameMode.CUSTOMIZE_RANDOM_START &&
       !gameState.initialProfileGenerated &&
       gameState.aiLoadingStatus.status === 'idle' &&
       !isLoadingFromSave &&
-      !gameState.currentAIScene // Additional check to prevent overriding loaded content
+      !gameState.currentAIScene && // Additional check to prevent overriding loaded content
+      hasAttemptedInitialLoad // Only run after initial load attempt
     ) {
       triggerAIStory('GENERATE_FULL_RANDOM_PROFILE', true);
     }
@@ -1893,6 +1896,7 @@ export const useGameLogic = () => {
     gameState.aiLoadingStatus.status,
     gameState.currentAIScene, // Added dependency
     isLoadingFromSave,
+    hasAttemptedInitialLoad,
     triggerAIStory,
   ]);
 
@@ -2164,31 +2168,39 @@ export const useGameLogic = () => {
     }
   }, [gameState]);
 
+  // Set initial load flag after component mounts
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setHasAttemptedInitialLoad(true);
+    }, 100); // Small delay to allow saved state loading
+
+    return () => clearTimeout(timer);
+  }, []);
+
   // Function to load saved game state
   const loadSavedGameState = useCallback(() => {
     const savedState = loadGameState();
     if (savedState) {
       setIsLoadingFromSave(true); // Set flag to prevent auto-generation
+
+      // Update state in a single atomic operation
+      setGameState(savedState);
       
-      // Update state in a single batch to prevent race conditions
-      setGameState(prevState => {
-        // Set appropriate static segment based on loaded state
-        if (savedState.gameMode === GameMode.ADVENTURE) {
-          setCurrentStaticSegmentId('AI_ADVENTURE_HANDOFF');
-        } else if (savedState.gameMode === GameMode.BATTLE) {
-          setCurrentStaticSegmentId('BATTLE_MODE');
-        } else if (savedState.initialProfileGenerated) {
-          setCurrentStaticSegmentId('CUSTOMIZED_START_READY');
-        }
-        
-        return savedState;
-      });
-      
+      // Set appropriate static segment based on loaded state
+      if (savedState.gameMode === GameMode.ADVENTURE) {
+        setCurrentStaticSegmentId('AI_ADVENTURE_HANDOFF');
+      } else if (savedState.gameMode === GameMode.BATTLE) {
+        setCurrentStaticSegmentId('BATTLE_MODE');
+      } else if (savedState.initialProfileGenerated) {
+        setCurrentStaticSegmentId('CUSTOMIZED_START_READY');
+      }
+
       // Clear the flag after state has stabilized
       setTimeout(() => {
         setIsLoadingFromSave(false);
-      }, 200); // Increased delay to ensure stability
+      }, 500); // Increased delay to ensure complete stability
     }
+    setHasAttemptedInitialLoad(true); // Mark that we've attempted initial load
   }, []);
 
   // Function to start fresh game (clear saved state)
@@ -2197,6 +2209,7 @@ export const useGameLogic = () => {
     setIsLoadingFromSave(false); // Clear the flag
     setGameState(INITIAL_GAME_STATE);
     setCurrentStaticSegmentId('INITIAL_PROFILE_PREPARATION');
+    setHasAttemptedInitialLoad(true); // Mark that we've attempted initial load
   }, []);
 
   return {
