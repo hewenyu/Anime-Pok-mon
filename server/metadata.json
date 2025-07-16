@@ -1,0 +1,6 @@
+{
+  "name": "二次元宝可梦对战",
+  "description": "一款日系二次元风格的宝可梦对战游戏，在上方显示敌方宝可梦信息，下方显示我方宝可梦信息。",
+  "requestFramePermissions": [],
+  "prompt": ""
+}
