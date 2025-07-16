@@ -37,8 +37,10 @@ import {
 } from '../constants';
 import {
   fetchStoryContinuation,
+  fetchStoryContinuationStream,
   classifyCustomizationIntent,
   OnRetryCallback,
+  OnStreamCallback,
 } from '../services/geminiService'; // Added classifyCustomizationIntent
 import {
   sanitizePokemonData,
@@ -441,16 +443,45 @@ export const useGameLogic = () => {
         }));
       };
 
+      const handleStreamCallback: OnStreamCallback = (
+        _partialResponse: string
+      ) => {
+        // For streaming responses, we could update a partial narrative in the UI
+        // For now, we'll just update the loading status to show streaming is active
+        updateGameState(prev => ({
+          ...prev,
+          aiLoadingStatus: {
+            status: 'loading',
+            message: 'AI正在回复中... (流式传输)',
+          },
+        }));
+      };
+
       const stateForAIContext = { ...gameState };
 
-      const aiResponse = await fetchStoryContinuation(
-        stateForAIContext,
-        playerActionTagOrInput,
-        fetchOptions,
-        handleRetryCallback,
-        0,
-        systemPromptToUse
-      );
+      let aiResponse;
+      // Use streaming for main story interactions, but not for customization actions
+      // which typically need complete responses for proper processing
+      if (!currentActionIsForCustomizationScreen && !imageRegenContext) {
+        aiResponse = await fetchStoryContinuationStream(
+          stateForAIContext,
+          playerActionTagOrInput || '',
+          handleStreamCallback,
+          fetchOptions,
+          handleRetryCallback,
+          0,
+          systemPromptToUse
+        );
+      } else {
+        aiResponse = await fetchStoryContinuation(
+          stateForAIContext,
+          playerActionTagOrInput || '',
+          fetchOptions,
+          handleRetryCallback,
+          0,
+          systemPromptToUse
+        );
+      }
 
       const localAiResponse = { ...aiResponse };
       let newAiSuggestedStartTimeFromThisResponse: number | undefined =
@@ -1850,7 +1881,19 @@ export const useGameLogic = () => {
         }));
       };
 
-      const aiResponse = await fetchStoryContinuation(
+      const handleStreamCallback: OnStreamCallback = (
+        _partialResponse: string
+      ) => {
+        updateGameState(prev => ({
+          ...prev,
+          aiLoadingStatus: {
+            status: 'loading',
+            message: 'NPC正在回应中... (流式传输)',
+          },
+        }));
+      };
+
+      const aiResponse = await fetchStoryContinuationStream(
         {
           ...gameState,
           knownNPCs: gameState.knownNPCs.map(n => ({
@@ -1859,6 +1902,7 @@ export const useGameLogic = () => {
           })),
         } as GameState,
         initialNpcPromptContent,
+        handleStreamCallback,
         undefined,
         handleRetry,
         0,
@@ -1988,7 +2032,19 @@ export const useGameLogic = () => {
         }));
       };
 
-      const aiResponse = await fetchStoryContinuation(
+      const handleStreamCallback: OnStreamCallback = (
+        _partialResponse: string
+      ) => {
+        updateGameState(prev => ({
+          ...prev,
+          aiLoadingStatus: {
+            status: 'loading',
+            message: 'NPC正在回应中... (流式传输)',
+          },
+        }));
+      };
+
+      const aiResponse = await fetchStoryContinuationStream(
         {
           ...gameState,
           knownNPCs: gameState.knownNPCs.map(n => ({
@@ -1997,6 +2053,7 @@ export const useGameLogic = () => {
           })),
         } as GameState,
         npcChatPrompt,
+        handleStreamCallback,
         undefined,
         handleRetry,
         0,

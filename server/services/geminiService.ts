@@ -304,7 +304,8 @@ async function fetchStoryContinuationInternal(
           temperature:
             systemPromptOverride ===
               GEMINI_CUSTOMIZATION_INTENT_CLASSIFIER_SYSTEM_PROMPT ||
-            systemPromptOverride === GEMINI_BATTLE_COMMAND_PARSER_SYSTEM_PROMPT ||
+            systemPromptOverride ===
+              GEMINI_BATTLE_COMMAND_PARSER_SYSTEM_PROMPT ||
             systemPromptOverride ===
               GEMINI_BATTLE_ITEM_ACTION_SUGGESTOR_SYSTEM_PROMPT
               ? 0.1
@@ -312,7 +313,8 @@ async function fetchStoryContinuationInternal(
           topK:
             systemPromptOverride ===
               GEMINI_CUSTOMIZATION_INTENT_CLASSIFIER_SYSTEM_PROMPT ||
-            systemPromptOverride === GEMINI_BATTLE_COMMAND_PARSER_SYSTEM_PROMPT ||
+            systemPromptOverride ===
+              GEMINI_BATTLE_COMMAND_PARSER_SYSTEM_PROMPT ||
             systemPromptOverride ===
               GEMINI_BATTLE_ITEM_ACTION_SUGGESTOR_SYSTEM_PROMPT
               ? 20
@@ -321,7 +323,8 @@ async function fetchStoryContinuationInternal(
           thinkingConfig:
             systemPromptOverride ===
               GEMINI_CUSTOMIZATION_INTENT_CLASSIFIER_SYSTEM_PROMPT ||
-            systemPromptOverride === GEMINI_BATTLE_COMMAND_PARSER_SYSTEM_PROMPT ||
+            systemPromptOverride ===
+              GEMINI_BATTLE_COMMAND_PARSER_SYSTEM_PROMPT ||
             systemPromptOverride ===
               GEMINI_BATTLE_ITEM_ACTION_SUGGESTOR_SYSTEM_PROMPT ||
             systemPromptOverride === GEMINI_MOVE_DESCRIPTION_SYSTEM_PROMPT
@@ -340,40 +343,45 @@ async function fetchStoryContinuationInternal(
       rawTrimmedText = accumulatedText.trim();
     } else {
       // Non-streaming implementation (existing code)
-      const response: GenerateContentResponse = await ai.models.generateContent({
-        model: GEMINI_MODEL,
-        contents: [{ role: 'user', parts: [{ text: userPromptContent }] }],
-        config: {
-          systemInstruction: systemPromptOverride,
-          responseMimeType: 'application/json',
-          temperature:
-            systemPromptOverride ===
-              GEMINI_CUSTOMIZATION_INTENT_CLASSIFIER_SYSTEM_PROMPT ||
-            systemPromptOverride === GEMINI_BATTLE_COMMAND_PARSER_SYSTEM_PROMPT ||
-            systemPromptOverride ===
-              GEMINI_BATTLE_ITEM_ACTION_SUGGESTOR_SYSTEM_PROMPT
-              ? 0.1
-              : 0.75,
-          topK:
-            systemPromptOverride ===
-              GEMINI_CUSTOMIZATION_INTENT_CLASSIFIER_SYSTEM_PROMPT ||
-            systemPromptOverride === GEMINI_BATTLE_COMMAND_PARSER_SYSTEM_PROMPT ||
-            systemPromptOverride ===
-              GEMINI_BATTLE_ITEM_ACTION_SUGGESTOR_SYSTEM_PROMPT
-              ? 20
-              : 40,
-          topP: 0.95,
-          thinkingConfig:
-            systemPromptOverride ===
-              GEMINI_CUSTOMIZATION_INTENT_CLASSIFIER_SYSTEM_PROMPT ||
-            systemPromptOverride === GEMINI_BATTLE_COMMAND_PARSER_SYSTEM_PROMPT ||
-            systemPromptOverride ===
-              GEMINI_BATTLE_ITEM_ACTION_SUGGESTOR_SYSTEM_PROMPT ||
-            systemPromptOverride === GEMINI_MOVE_DESCRIPTION_SYSTEM_PROMPT
-              ? { thinkingBudget: 0 }
-              : undefined,
-        },
-      });
+      const response: GenerateContentResponse = await ai.models.generateContent(
+        {
+          model: GEMINI_MODEL,
+          contents: [{ role: 'user', parts: [{ text: userPromptContent }] }],
+          config: {
+            systemInstruction: systemPromptOverride,
+            responseMimeType: 'application/json',
+            temperature:
+              systemPromptOverride ===
+                GEMINI_CUSTOMIZATION_INTENT_CLASSIFIER_SYSTEM_PROMPT ||
+              systemPromptOverride ===
+                GEMINI_BATTLE_COMMAND_PARSER_SYSTEM_PROMPT ||
+              systemPromptOverride ===
+                GEMINI_BATTLE_ITEM_ACTION_SUGGESTOR_SYSTEM_PROMPT
+                ? 0.1
+                : 0.75,
+            topK:
+              systemPromptOverride ===
+                GEMINI_CUSTOMIZATION_INTENT_CLASSIFIER_SYSTEM_PROMPT ||
+              systemPromptOverride ===
+                GEMINI_BATTLE_COMMAND_PARSER_SYSTEM_PROMPT ||
+              systemPromptOverride ===
+                GEMINI_BATTLE_ITEM_ACTION_SUGGESTOR_SYSTEM_PROMPT
+                ? 20
+                : 40,
+            topP: 0.95,
+            thinkingConfig:
+              systemPromptOverride ===
+                GEMINI_CUSTOMIZATION_INTENT_CLASSIFIER_SYSTEM_PROMPT ||
+              systemPromptOverride ===
+                GEMINI_BATTLE_COMMAND_PARSER_SYSTEM_PROMPT ||
+              systemPromptOverride ===
+                GEMINI_BATTLE_ITEM_ACTION_SUGGESTOR_SYSTEM_PROMPT ||
+              systemPromptOverride === GEMINI_MOVE_DESCRIPTION_SYSTEM_PROMPT
+                ? { thinkingBudget: 0 }
+                : undefined,
+          },
+        }
+      );
 
       rawTrimmedText = response.text.trim();
     }
@@ -999,18 +1007,20 @@ async function parsePlayerBattleCommandInternal(
       rawTrimmedText = accumulatedText.trim();
     } else {
       // Non-streaming implementation (existing code)
-      const response: GenerateContentResponse = await ai.models.generateContent({
-        model: GEMINI_MODEL,
-        contents: [{ role: 'user', parts: [{ text: prompt }] }],
-        config: {
-          systemInstruction: GEMINI_BATTLE_COMMAND_PARSER_SYSTEM_PROMPT,
-          responseMimeType: 'application/json',
-          temperature: 0.2,
-          topK: 20,
-          topP: 0.9,
-          thinkingConfig: { thinkingBudget: 0 },
-        },
-      });
+      const response: GenerateContentResponse = await ai.models.generateContent(
+        {
+          model: GEMINI_MODEL,
+          contents: [{ role: 'user', parts: [{ text: prompt }] }],
+          config: {
+            systemInstruction: GEMINI_BATTLE_COMMAND_PARSER_SYSTEM_PROMPT,
+            responseMimeType: 'application/json',
+            temperature: 0.2,
+            topK: 20,
+            topP: 0.9,
+            thinkingConfig: { thinkingBudget: 0 },
+          },
+        }
+      );
 
       rawTrimmedText = response.text.trim();
     }
@@ -1204,18 +1214,21 @@ Please provide item action suggestions based on this context.
       rawTrimmedText = accumulatedText.trim();
     } else {
       // Non-streaming implementation (existing code)
-      const response: GenerateContentResponse = await ai.models.generateContent({
-        model: GEMINI_MODEL,
-        contents: [{ role: 'user', parts: [{ text: prompt }] }],
-        config: {
-          systemInstruction: GEMINI_BATTLE_ITEM_ACTION_SUGGESTOR_SYSTEM_PROMPT,
-          responseMimeType: 'application/json',
-          temperature: 0.2,
-          topK: 20,
-          topP: 0.9,
-          thinkingConfig: { thinkingBudget: 0 },
-        },
-      });
+      const response: GenerateContentResponse = await ai.models.generateContent(
+        {
+          model: GEMINI_MODEL,
+          contents: [{ role: 'user', parts: [{ text: prompt }] }],
+          config: {
+            systemInstruction:
+              GEMINI_BATTLE_ITEM_ACTION_SUGGESTOR_SYSTEM_PROMPT,
+            responseMimeType: 'application/json',
+            temperature: 0.2,
+            topK: 20,
+            topP: 0.9,
+            thinkingConfig: { thinkingBudget: 0 },
+          },
+        }
+      );
 
       rawTrimmedText = response.text.trim();
     }

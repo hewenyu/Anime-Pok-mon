@@ -23,9 +23,10 @@ import {
 } from '../services/battleService';
 import { STATUS_CONDITION_INFO } from '../constants';
 import {
-  parsePlayerBattleCommand,
+  parsePlayerBattleCommandStream,
   OnRetryCallback,
-  fetchBattleItemActionSuggestions,
+  OnStreamCallback,
+  fetchBattleItemActionSuggestionsStream,
 } from '../services/geminiService';
 
 type BattleScreen =
@@ -301,13 +302,23 @@ const BattleView: React.FC<BattleViewProps> = ({
       'ai_item_action_suggestion'
     );
 
-    const aiResponse = await fetchBattleItemActionSuggestions(
+    const handleStreamCallback: OnStreamCallback = (
+      _partialResponse: string
+    ) => {
+      setItemSubActionLoading({
+        status: 'loading',
+        message: `AI正在分析 ${item.name} 用法... (流式传输)`,
+      });
+    };
+
+    const aiResponse = await fetchBattleItemActionSuggestionsStream(
       item.name,
       activePlayerPokemon,
       enemyPokemon,
       playerTeam.filter(
         p => p.instanceId !== activePlayerPokemon.instanceId && !p.isFainted
-      )
+      ),
+      handleStreamCallback
     );
 
     if (
@@ -1022,9 +1033,19 @@ const BattleView: React.FC<BattleViewProps> = ({
       );
     };
 
-    const parsedAction = await parsePlayerBattleCommand(
+    const handleStreamCallback: OnStreamCallback = (
+      _partialResponse: string
+    ) => {
+      setCommandParseLoadingStatus({
+        status: 'loading',
+        message: 'AI正在解析指令中... (流式传输)',
+      });
+    };
+
+    const parsedAction = await parsePlayerBattleCommandStream(
       playerInput,
       context,
+      handleStreamCallback,
       handleRetryCallback
     );
     setPlayerInput('');
