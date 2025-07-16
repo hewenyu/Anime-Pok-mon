@@ -28,6 +28,7 @@ import {
 } from '../constants';
 
 const API_KEY = process.env.API_KEY;
+const GEMINI_MODEL = process.env.GEMINI_MODEL || 'gemini-2.5-flash';
 
 if (!API_KEY) {
   console.error(
@@ -60,6 +61,8 @@ export type OnRetryCallback = (
   maxAttempts: number,
   errorType: 'format' | 'api'
 ) => void;
+
+export type OnStreamCallback = (partialResponse: string) => void;
 
 function buildPrompt(
   gameState: GameState,
@@ -206,6 +209,49 @@ export async function fetchStoryContinuation(
   retryCount = 0,
   systemPromptOverride: string = GEMINI_GAME_MASTER_SYSTEM_PROMPT
 ): Promise<AIStoryResponse> {
+  return fetchStoryContinuationInternal(
+    gameState,
+    playerActionTagOrInputOrSpecializedPrompt,
+    options,
+    onRetry,
+    retryCount,
+    systemPromptOverride,
+    false, // not streaming
+    undefined
+  );
+}
+
+export async function fetchStoryContinuationStream(
+  gameState: GameState,
+  playerActionTagOrInputOrSpecializedPrompt: string,
+  onStream?: OnStreamCallback,
+  options?: FetchOptions,
+  onRetry?: OnRetryCallback,
+  retryCount = 0,
+  systemPromptOverride: string = GEMINI_GAME_MASTER_SYSTEM_PROMPT
+): Promise<AIStoryResponse> {
+  return fetchStoryContinuationInternal(
+    gameState,
+    playerActionTagOrInputOrSpecializedPrompt,
+    options,
+    onRetry,
+    retryCount,
+    systemPromptOverride,
+    true, // streaming
+    onStream
+  );
+}
+
+async function fetchStoryContinuationInternal(
+  gameState: GameState,
+  playerActionTagOrInputOrSpecializedPrompt: string, // Can be actionTag, user input, or a fully formed prompt for specialized AIs
+  options?: FetchOptions,
+  onRetry?: OnRetryCallback,
+  retryCount = 0,
+  systemPromptOverride: string = GEMINI_GAME_MASTER_SYSTEM_PROMPT,
+  useStreaming: boolean = false,
+  onStream?: OnStreamCallback
+): Promise<AIStoryResponse> {
   if (!API_KEY) {
     return {
       narrative:
@@ -247,42 +293,98 @@ export async function fetchStoryContinuation(
   let rawTrimmedText = '';
 
   try {
-    const response: GenerateContentResponse = await ai.models.generateContent({
-      model: 'gemini-2.5-flash',
-      contents: [{ role: 'user', parts: [{ text: userPromptContent }] }],
-      config: {
-        systemInstruction: systemPromptOverride,
-        responseMimeType: 'application/json',
-        temperature:
-          systemPromptOverride ===
-            GEMINI_CUSTOMIZATION_INTENT_CLASSIFIER_SYSTEM_PROMPT ||
-          systemPromptOverride === GEMINI_BATTLE_COMMAND_PARSER_SYSTEM_PROMPT ||
-          systemPromptOverride ===
-            GEMINI_BATTLE_ITEM_ACTION_SUGGESTOR_SYSTEM_PROMPT
-            ? 0.1
-            : 0.75,
-        topK:
-          systemPromptOverride ===
-            GEMINI_CUSTOMIZATION_INTENT_CLASSIFIER_SYSTEM_PROMPT ||
-          systemPromptOverride === GEMINI_BATTLE_COMMAND_PARSER_SYSTEM_PROMPT ||
-          systemPromptOverride ===
-            GEMINI_BATTLE_ITEM_ACTION_SUGGESTOR_SYSTEM_PROMPT
-            ? 20
-            : 40,
-        topP: 0.95,
-        thinkingConfig:
-          systemPromptOverride ===
-            GEMINI_CUSTOMIZATION_INTENT_CLASSIFIER_SYSTEM_PROMPT ||
-          systemPromptOverride === GEMINI_BATTLE_COMMAND_PARSER_SYSTEM_PROMPT ||
-          systemPromptOverride ===
-            GEMINI_BATTLE_ITEM_ACTION_SUGGESTOR_SYSTEM_PROMPT ||
-          systemPromptOverride === GEMINI_MOVE_DESCRIPTION_SYSTEM_PROMPT
-            ? { thinkingBudget: 0 }
-            : undefined,
-      },
-    });
+    if (useStreaming && onStream) {
+      // Streaming implementation
+      const streamResponse = await ai.models.generateContentStream({
+        model: GEMINI_MODEL,
+        contents: [{ role: 'user', parts: [{ text: userPromptContent }] }],
+        config: {
+          systemInstruction: systemPromptOverride,
+          responseMimeType: 'application/json',
+          temperature:
+            systemPromptOverride ===
+              GEMINI_CUSTOMIZATION_INTENT_CLASSIFIER_SYSTEM_PROMPT ||
+            systemPromptOverride ===
+              GEMINI_BATTLE_COMMAND_PARSER_SYSTEM_PROMPT ||
+            systemPromptOverride ===
+              GEMINI_BATTLE_ITEM_ACTION_SUGGESTOR_SYSTEM_PROMPT
+              ? 0.1
+              : 0.75,
+          topK:
+            systemPromptOverride ===
+              GEMINI_CUSTOMIZATION_INTENT_CLASSIFIER_SYSTEM_PROMPT ||
+            systemPromptOverride ===
+              GEMINI_BATTLE_COMMAND_PARSER_SYSTEM_PROMPT ||
+            systemPromptOverride ===
+              GEMINI_BATTLE_ITEM_ACTION_SUGGESTOR_SYSTEM_PROMPT
+              ? 20
+              : 40,
+          topP: 0.95,
+          thinkingConfig:
+            systemPromptOverride ===
+              GEMINI_CUSTOMIZATION_INTENT_CLASSIFIER_SYSTEM_PROMPT ||
+            systemPromptOverride ===
+              GEMINI_BATTLE_COMMAND_PARSER_SYSTEM_PROMPT ||
+            systemPromptOverride ===
+              GEMINI_BATTLE_ITEM_ACTION_SUGGESTOR_SYSTEM_PROMPT ||
+            systemPromptOverride === GEMINI_MOVE_DESCRIPTION_SYSTEM_PROMPT
+              ? { thinkingBudget: 0 }
+              : undefined,
+        },
+      });
 
-    rawTrimmedText = response.text.trim();
+      let accumulatedText = '';
+      for await (const chunk of streamResponse) {
+        if (chunk.text) {
+          accumulatedText += chunk.text;
+          onStream(accumulatedText);
+        }
+      }
+      rawTrimmedText = accumulatedText.trim();
+    } else {
+      // Non-streaming implementation (existing code)
+      const response: GenerateContentResponse = await ai.models.generateContent(
+        {
+          model: GEMINI_MODEL,
+          contents: [{ role: 'user', parts: [{ text: userPromptContent }] }],
+          config: {
+            systemInstruction: systemPromptOverride,
+            responseMimeType: 'application/json',
+            temperature:
+              systemPromptOverride ===
+                GEMINI_CUSTOMIZATION_INTENT_CLASSIFIER_SYSTEM_PROMPT ||
+              systemPromptOverride ===
+                GEMINI_BATTLE_COMMAND_PARSER_SYSTEM_PROMPT ||
+              systemPromptOverride ===
+                GEMINI_BATTLE_ITEM_ACTION_SUGGESTOR_SYSTEM_PROMPT
+                ? 0.1
+                : 0.75,
+            topK:
+              systemPromptOverride ===
+                GEMINI_CUSTOMIZATION_INTENT_CLASSIFIER_SYSTEM_PROMPT ||
+              systemPromptOverride ===
+                GEMINI_BATTLE_COMMAND_PARSER_SYSTEM_PROMPT ||
+              systemPromptOverride ===
+                GEMINI_BATTLE_ITEM_ACTION_SUGGESTOR_SYSTEM_PROMPT
+                ? 20
+                : 40,
+            topP: 0.95,
+            thinkingConfig:
+              systemPromptOverride ===
+                GEMINI_CUSTOMIZATION_INTENT_CLASSIFIER_SYSTEM_PROMPT ||
+              systemPromptOverride ===
+                GEMINI_BATTLE_COMMAND_PARSER_SYSTEM_PROMPT ||
+              systemPromptOverride ===
+                GEMINI_BATTLE_ITEM_ACTION_SUGGESTOR_SYSTEM_PROMPT ||
+              systemPromptOverride === GEMINI_MOVE_DESCRIPTION_SYSTEM_PROMPT
+                ? { thinkingBudget: 0 }
+                : undefined,
+          },
+        }
+      );
+
+      rawTrimmedText = response.text.trim();
+    }
     jsonText = rawTrimmedText;
 
     const fenceRegex = /^```(\w*)?\s*\n?(.*?)\n?\s*```$/s;
@@ -664,13 +766,15 @@ export async function fetchStoryContinuation(
         await new Promise(resolve =>
           setTimeout(resolve, 750 + retryCount * 250)
         );
-        return fetchStoryContinuation(
+        return fetchStoryContinuationInternal(
           gameState,
           playerActionTagOrInputOrSpecializedPrompt,
           options,
           onRetry,
           retryCount + 1,
-          systemPromptOverride
+          systemPromptOverride,
+          useStreaming,
+          onStream
         );
       } else {
         return {
@@ -726,7 +830,7 @@ export async function classifyCustomizationIntent(
   let jsonText = '';
   try {
     const response = await ai.models.generateContent({
-      model: 'gemini-2.5-flash',
+      model: GEMINI_MODEL,
       contents: [{ role: 'user', parts: [{ text: intentClassifierPrompt }] }],
       config: {
         systemInstruction: GEMINI_CUSTOMIZATION_INTENT_CLASSIFIER_SYSTEM_PROMPT,
@@ -789,7 +893,7 @@ export async function fetchMoveDescription(
 
   try {
     const response: GenerateContentResponse = await ai.models.generateContent({
-      model: 'gemini-2.5-flash',
+      model: GEMINI_MODEL,
       contents: [{ role: 'user', parts: [{ text: userPrompt }] }],
       config: {
         systemInstruction: GEMINI_MOVE_DESCRIPTION_SYSTEM_PROMPT,
@@ -811,6 +915,41 @@ export async function parsePlayerBattleCommand(
   context: BattleCommandParseContext,
   onRetry?: OnRetryCallback,
   retryCount = 0
+): Promise<ParsedBattleAction> {
+  return parsePlayerBattleCommandInternal(
+    commandText,
+    context,
+    onRetry,
+    retryCount,
+    false, // not streaming
+    undefined
+  );
+}
+
+export async function parsePlayerBattleCommandStream(
+  commandText: string,
+  context: BattleCommandParseContext,
+  onStream?: OnStreamCallback,
+  onRetry?: OnRetryCallback,
+  retryCount = 0
+): Promise<ParsedBattleAction> {
+  return parsePlayerBattleCommandInternal(
+    commandText,
+    context,
+    onRetry,
+    retryCount,
+    true, // streaming
+    onStream
+  );
+}
+
+async function parsePlayerBattleCommandInternal(
+  commandText: string,
+  context: BattleCommandParseContext,
+  onRetry?: OnRetryCallback,
+  retryCount = 0,
+  useStreaming: boolean = false,
+  onStream?: OnStreamCallback
 ): Promise<ParsedBattleAction> {
   if (!API_KEY) {
     return {
@@ -843,20 +982,48 @@ export async function parsePlayerBattleCommand(
   let rawTrimmedText = '';
 
   try {
-    const response: GenerateContentResponse = await ai.models.generateContent({
-      model: 'gemini-2.5-flash',
-      contents: [{ role: 'user', parts: [{ text: prompt }] }],
-      config: {
-        systemInstruction: GEMINI_BATTLE_COMMAND_PARSER_SYSTEM_PROMPT,
-        responseMimeType: 'application/json',
-        temperature: 0.2,
-        topK: 20,
-        topP: 0.9,
-        thinkingConfig: { thinkingBudget: 0 },
-      },
-    });
+    if (useStreaming && onStream) {
+      // Streaming implementation
+      const streamResponse = await ai.models.generateContentStream({
+        model: GEMINI_MODEL,
+        contents: [{ role: 'user', parts: [{ text: prompt }] }],
+        config: {
+          systemInstruction: GEMINI_BATTLE_COMMAND_PARSER_SYSTEM_PROMPT,
+          responseMimeType: 'application/json',
+          temperature: 0.2,
+          topK: 20,
+          topP: 0.9,
+          thinkingConfig: { thinkingBudget: 0 },
+        },
+      });
 
-    rawTrimmedText = response.text.trim();
+      let accumulatedText = '';
+      for await (const chunk of streamResponse) {
+        if (chunk.text) {
+          accumulatedText += chunk.text;
+          onStream(accumulatedText);
+        }
+      }
+      rawTrimmedText = accumulatedText.trim();
+    } else {
+      // Non-streaming implementation (existing code)
+      const response: GenerateContentResponse = await ai.models.generateContent(
+        {
+          model: GEMINI_MODEL,
+          contents: [{ role: 'user', parts: [{ text: prompt }] }],
+          config: {
+            systemInstruction: GEMINI_BATTLE_COMMAND_PARSER_SYSTEM_PROMPT,
+            responseMimeType: 'application/json',
+            temperature: 0.2,
+            topK: 20,
+            topP: 0.9,
+            thinkingConfig: { thinkingBudget: 0 },
+          },
+        }
+      );
+
+      rawTrimmedText = response.text.trim();
+    }
     jsonText = rawTrimmedText;
 
     const fenceRegex = /^```(\w*)?\s*\n?(.*?)\n?\s*```$/s;
@@ -905,11 +1072,13 @@ export async function parsePlayerBattleCommand(
         onRetry(retryCount + 1, MAX_RETRIES + 1, 'format');
       }
       await new Promise(resolve => setTimeout(resolve, 500 + retryCount * 250));
-      return parsePlayerBattleCommand(
+      return parsePlayerBattleCommandInternal(
         commandText,
         context,
         onRetry,
-        retryCount + 1
+        retryCount + 1,
+        useStreaming,
+        onStream
       );
     }
     return {
@@ -927,6 +1096,49 @@ export async function fetchBattleItemActionSuggestions(
   benchedPlayerPokemon: Pokemon[],
   onRetry?: OnRetryCallback,
   retryCount = 0
+): Promise<AIStoryResponse> {
+  return fetchBattleItemActionSuggestionsInternal(
+    itemName,
+    activePlayerPokemon,
+    enemyPokemon,
+    benchedPlayerPokemon,
+    onRetry,
+    retryCount,
+    false, // not streaming
+    undefined
+  );
+}
+
+export async function fetchBattleItemActionSuggestionsStream(
+  itemName: string,
+  activePlayerPokemon: Pokemon,
+  enemyPokemon: Pokemon,
+  benchedPlayerPokemon: Pokemon[],
+  onStream?: OnStreamCallback,
+  onRetry?: OnRetryCallback,
+  retryCount = 0
+): Promise<AIStoryResponse> {
+  return fetchBattleItemActionSuggestionsInternal(
+    itemName,
+    activePlayerPokemon,
+    enemyPokemon,
+    benchedPlayerPokemon,
+    onRetry,
+    retryCount,
+    true, // streaming
+    onStream
+  );
+}
+
+async function fetchBattleItemActionSuggestionsInternal(
+  itemName: string,
+  activePlayerPokemon: Pokemon,
+  enemyPokemon: Pokemon,
+  benchedPlayerPokemon: Pokemon[],
+  onRetry?: OnRetryCallback,
+  retryCount = 0,
+  useStreaming: boolean = false,
+  onStream?: OnStreamCallback
 ): Promise<AIStoryResponse> {
   if (!API_KEY) {
     return {
@@ -977,20 +1189,49 @@ Please provide item action suggestions based on this context.
   let rawTrimmedText = '';
 
   try {
-    const response: GenerateContentResponse = await ai.models.generateContent({
-      model: 'gemini-2.5-flash',
-      contents: [{ role: 'user', parts: [{ text: prompt }] }],
-      config: {
-        systemInstruction: GEMINI_BATTLE_ITEM_ACTION_SUGGESTOR_SYSTEM_PROMPT,
-        responseMimeType: 'application/json',
-        temperature: 0.2,
-        topK: 20,
-        topP: 0.9,
-        thinkingConfig: { thinkingBudget: 0 },
-      },
-    });
+    if (useStreaming && onStream) {
+      // Streaming implementation
+      const streamResponse = await ai.models.generateContentStream({
+        model: GEMINI_MODEL,
+        contents: [{ role: 'user', parts: [{ text: prompt }] }],
+        config: {
+          systemInstruction: GEMINI_BATTLE_ITEM_ACTION_SUGGESTOR_SYSTEM_PROMPT,
+          responseMimeType: 'application/json',
+          temperature: 0.2,
+          topK: 20,
+          topP: 0.9,
+          thinkingConfig: { thinkingBudget: 0 },
+        },
+      });
 
-    rawTrimmedText = response.text.trim();
+      let accumulatedText = '';
+      for await (const chunk of streamResponse) {
+        if (chunk.text) {
+          accumulatedText += chunk.text;
+          onStream(accumulatedText);
+        }
+      }
+      rawTrimmedText = accumulatedText.trim();
+    } else {
+      // Non-streaming implementation (existing code)
+      const response: GenerateContentResponse = await ai.models.generateContent(
+        {
+          model: GEMINI_MODEL,
+          contents: [{ role: 'user', parts: [{ text: prompt }] }],
+          config: {
+            systemInstruction:
+              GEMINI_BATTLE_ITEM_ACTION_SUGGESTOR_SYSTEM_PROMPT,
+            responseMimeType: 'application/json',
+            temperature: 0.2,
+            topK: 20,
+            topP: 0.9,
+            thinkingConfig: { thinkingBudget: 0 },
+          },
+        }
+      );
+
+      rawTrimmedText = response.text.trim();
+    }
     jsonText = rawTrimmedText;
     const fenceRegex = /^```(\w*)?\s*\n?(.*?)\n?\s*```$/s;
     const match = jsonText.match(fenceRegex);
@@ -1024,13 +1265,15 @@ Please provide item action suggestions based on this context.
         onRetry(retryCount + 1, MAX_RETRIES + 1, 'format');
       }
       await new Promise(resolve => setTimeout(resolve, 500 + retryCount * 250));
-      return fetchBattleItemActionSuggestions(
+      return fetchBattleItemActionSuggestionsInternal(
         itemName,
         activePlayerPokemon,
         enemyPokemon,
         benchedPlayerPokemon,
         onRetry,
-        retryCount + 1
+        retryCount + 1,
+        useStreaming,
+        onStream
       );
     }
     return {
