@@ -4,6 +4,7 @@ import { GameMode, NPC, StorySegment } from '../types'; // Corrected path
 import { useGameLogic } from '../hooks/useGameLogic'; // Corrected path
 import { useModals } from '../hooks/useModals'; // Corrected path
 import { sanitizePokemonData, sanitizeItemData } from '../utils/dataSanitizers'; // Corrected path
+import { hasSavedGameState, getSavedGameTimestamp } from '../utils/gameStateStorage';
 // Fix: Added missing import for STORY_DATA
 import { STORY_DATA } from '../constants'; // Corrected path
 
@@ -17,8 +18,13 @@ import CustomizeRandomStartScreen from './CustomizeRandomStartScreen.tsx';
 import PlayerProfileEditModal from './PlayerProfileEditModal.tsx';
 import InventoryModal from './InventoryModal.tsx';
 import PokemonDetailModal from './PokemonDetailModal.tsx';
+import ContinueGameModal from './ContinueGameModal.tsx';
 
 const App: React.FC = () => {
+  // State for continue game modal
+  const [showContinueModal, setShowContinueModal] = React.useState(false);
+  const [savedGameTimestamp, setSavedGameTimestamp] = React.useState<number>(0);
+
   const gameLogic = useGameLogic();
   const {
     gameState,
@@ -43,6 +49,8 @@ const App: React.FC = () => {
     handleSendPlayerMessageToNPC,
     npcInteractionLoading,
     clearCustomizationAssistantResponse, // Added
+    loadSavedGameState,
+    startFreshGame,
   } = gameLogic;
 
   const {
@@ -76,6 +84,28 @@ const App: React.FC = () => {
       setSelectedNPCForChat,
       setNpcChatSuggestions
     );
+  };
+
+  // Check for saved game state on component mount
+  React.useEffect(() => {
+    if (hasSavedGameState()) {
+      const timestamp = getSavedGameTimestamp();
+      if (timestamp) {
+        setSavedGameTimestamp(timestamp);
+        setShowContinueModal(true);
+      }
+    }
+  }, []);
+
+  // Handle continue game modal actions
+  const handleContinueGame = () => {
+    loadSavedGameState();
+    setShowContinueModal(false);
+  };
+
+  const handleRestartGame = () => {
+    startFreshGame();
+    setShowContinueModal(false);
   };
 
   const memoizedHandleSendPlayerMessageToNPC = (
@@ -279,6 +309,15 @@ const App: React.FC = () => {
   return (
     <>
       {renderContent()}
+      
+      {/* Continue Game Modal */}
+      <ContinueGameModal
+        isOpen={showContinueModal}
+        savedGameTimestamp={savedGameTimestamp}
+        onContinue={handleContinueGame}
+        onRestart={handleRestartGame}
+      />
+      
       {showHistoryModal && (
         <HistoryModal
           isOpen={showHistoryModal}

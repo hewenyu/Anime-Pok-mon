@@ -47,6 +47,11 @@ import {
   sanitizeNPCData,
   sanitizeItemData,
 } from '../utils/dataSanitizers';
+import {
+  saveGameState,
+  loadGameState,
+  clearSavedGameState,
+} from '../utils/gameStateStorage';
 
 // Helper to convert UserDateTimeInput to a Unix timestamp
 const userDateTimeToTimestamp = (input: UserDateTimeInput): number => {
@@ -2110,6 +2115,37 @@ export const useGameLogic = () => {
     }));
   }, [updateGameState]);
 
+  // Auto-save game state to localStorage when it changes
+  useEffect(() => {
+    // Only save if the game has progressed beyond initial customization
+    if (gameState.gameMode !== GameMode.CUSTOMIZE_RANDOM_START || gameState.initialProfileGenerated) {
+      saveGameState(gameState);
+    }
+  }, [gameState]);
+
+  // Function to load saved game state
+  const loadSavedGameState = useCallback(() => {
+    const savedState = loadGameState();
+    if (savedState) {
+      setGameState(savedState);
+      // Set appropriate static segment based on loaded state
+      if (savedState.gameMode === GameMode.ADVENTURE) {
+        setCurrentStaticSegmentId('AI_ADVENTURE_HANDOFF');
+      } else if (savedState.gameMode === GameMode.BATTLE) {
+        setCurrentStaticSegmentId('BATTLE_MODE');
+      } else if (savedState.initialProfileGenerated) {
+        setCurrentStaticSegmentId('CUSTOMIZED_START_READY');
+      }
+    }
+  }, []);
+
+  // Function to start fresh game (clear saved state)
+  const startFreshGame = useCallback(() => {
+    clearSavedGameState();
+    setGameState(INITIAL_GAME_STATE);
+    setCurrentStaticSegmentId('INITIAL_PROFILE_PREPARATION');
+  }, []);
+
   return {
     gameState,
     currentStaticSegmentId,
@@ -2133,5 +2169,7 @@ export const useGameLogic = () => {
     handleSendPlayerMessageToNPC,
     npcInteractionLoading,
     clearCustomizationAssistantResponse,
+    loadSavedGameState,
+    startFreshGame,
   };
 };
