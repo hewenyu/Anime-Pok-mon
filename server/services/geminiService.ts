@@ -20,11 +20,23 @@ import {
 
 const API_KEY = process.env.API_KEY;
 
+
 if (!API_KEY) {
   console.error("API_KEY is not set. Please ensure the API_KEY environment variable is configured.");
 }
 
-const ai = new GoogleGenAI({ apiKey: API_KEY! });
+if (!process.env.GOOGLE_GEMINI_BASE_URL) {
+  throw new Error("GOOGLE_GEMINI_BASE_URL environment variable not set");
+}
+
+const httpOptions = {
+  headers: {
+    'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36',
+  },
+  baseUrl: process.env.GOOGLE_GEMINI_BASE_URL,
+};
+
+const ai = new GoogleGenAI({ apiKey: API_KEY!, httpOptions });
 const MAX_RETRIES = 2; // Allows for 1 initial attempt + 2 retries = 3 total attempts
 
 interface FetchOptions {
