@@ -98,7 +98,8 @@ export const useGameLogic = () => {
     'INITIAL_PROFILE_PREPARATION'
   );
   const [isLoadingFromSave, setIsLoadingFromSave] = useState<boolean>(false);
-  const [hasAttemptedInitialLoad, setHasAttemptedInitialLoad] = useState<boolean>(false);
+  const [hasAttemptedInitialLoad, setHasAttemptedInitialLoad] =
+    useState<boolean>(false);
 
   const advanceGameTimeInternal = (
     currentTs: number,
@@ -2185,7 +2186,7 @@ export const useGameLogic = () => {
 
       // Update state in a single atomic operation
       setGameState(savedState);
-      
+
       // Set appropriate static segment based on loaded state
       if (savedState.gameMode === GameMode.ADVENTURE) {
         setCurrentStaticSegmentId('AI_ADVENTURE_HANDOFF');

@@ -23,7 +23,9 @@ const BattleHistoryModal: React.FC<BattleHistoryModalProps> = ({
     const seconds = Math.floor(duration / 1000);
     const minutes = Math.floor(seconds / 60);
     const remainingSeconds = seconds % 60;
-    return minutes > 0 ? `${minutes}分${remainingSeconds}秒` : `${remainingSeconds}秒`;
+    return minutes > 0
+      ? `${minutes}分${remainingSeconds}秒`
+      : `${remainingSeconds}秒`;
   };
 
   const getOutcomeText = (outcome: string) => {

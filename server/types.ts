@@ -406,7 +406,7 @@ export interface GameState {
 
   chatHistory: ChatHistoryEntry[]; // Main game/event log.
   knownNPCs: NPC[];
-  
+
   // Battle history tracking
   battleHistory: BattleRecord[]; // Detailed battle records
 

@@ -32,7 +32,7 @@ const ContinueGameModal: React.FC<ContinueGameModalProps> = ({
         <div className="modal-header-base">
           <h2>继续冒险</h2>
         </div>
-        
+
         <div className="modal-body-base">
           <div className="text-center mb-6">
             <div className="mb-4">
@@ -41,11 +41,11 @@ const ContinueGameModal: React.FC<ContinueGameModalProps> = ({
                 保存时间：{formatSavedTime(savedGameTimestamp)}
               </div>
             </div>
-            
+
             <div className="text-base mb-6">
               你想要继续上次的冒险，还是开始全新的冒险？
             </div>
-            
+
             <div className="flex gap-4 justify-center">
               <button
                 className="choice-button"
@@ -54,7 +54,7 @@ const ContinueGameModal: React.FC<ContinueGameModalProps> = ({
               >
                 继续冒险
               </button>
-              
+
               <button
                 className="choice-button secondary"
                 onClick={onRestart}
@@ -63,9 +63,9 @@ const ContinueGameModal: React.FC<ContinueGameModalProps> = ({
                 重新开始
               </button>
             </div>
-            
+
             <div className="text-xs text-gray-500 mt-4">
-              选择"重新开始"将清除之前的存档
+              选择&quot;重新开始&quot;将清除之前的存档
             </div>
           </div>
         </div>

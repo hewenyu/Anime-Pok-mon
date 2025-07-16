@@ -4,7 +4,10 @@ import { GameMode, NPC, StorySegment } from '../types'; // Corrected path
 import { useGameLogic } from '../hooks/useGameLogic'; // Corrected path
 import { useModals } from '../hooks/useModals'; // Corrected path
 import { sanitizePokemonData, sanitizeItemData } from '../utils/dataSanitizers'; // Corrected path
-import { hasSavedGameState, getSavedGameTimestamp } from '../utils/gameStateStorage';
+import {
+  hasSavedGameState,
+  getSavedGameTimestamp,
+} from '../utils/gameStateStorage';
 // Fix: Added missing import for STORY_DATA
 import { STORY_DATA } from '../constants'; // Corrected path
 
@@ -313,7 +316,7 @@ const App: React.FC = () => {
   return (
     <>
       {renderContent()}
-      
+
       {/* Continue Game Modal */}
       <ContinueGameModal
         isOpen={showContinueModal}
@@ -321,7 +324,7 @@ const App: React.FC = () => {
         onContinue={handleContinueGame}
         onRestart={handleRestartGame}
       />
-      
+
       {showHistoryModal && (
         <HistoryModal
           isOpen={showHistoryModal}
