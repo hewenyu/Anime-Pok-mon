@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { InventoryItem } from '../types';
 
@@ -8,14 +7,20 @@ interface InventoryModalProps {
   inventory: InventoryItem[];
 }
 
-const InventoryModal: React.FC<InventoryModalProps> = ({ isOpen, onClose, inventory }) => {
+const InventoryModal: React.FC<InventoryModalProps> = ({
+  isOpen,
+  onClose,
+  inventory,
+}) => {
   const [expandedItemId, setExpandedItemId] = useState<string | null>(null);
 
   if (!isOpen) {
     return null;
   }
 
-  const handleImageError = (e: React.SyntheticEvent<HTMLImageElement, Event>) => {
+  const handleImageError = (
+    e: React.SyntheticEvent<HTMLImageElement, Event>
+  ) => {
     const target = e.target as HTMLImageElement;
     target.onerror = null; // Prevent infinite loop if placeholder also fails
     // Use a placeholder that includes the first letter of the item name
@@ -24,15 +29,33 @@ const InventoryModal: React.FC<InventoryModalProps> = ({ isOpen, onClose, invent
   };
 
   const toggleItemExpansion = (itemId: string) => {
-    setExpandedItemId(prevId => prevId === itemId ? null : itemId);
+    setExpandedItemId(prevId => (prevId === itemId ? null : itemId));
   };
 
   return (
-    <div className="modal-overlay-base" onClick={onClose} role="dialog" aria-modal="true" aria-labelledby="inventoryModalTitle">
-      <div className="inventory-modal-content modal-content-base max-w-md" onClick={(e) => e.stopPropagation()}>
-        <div className="modal-header-base inventory-modal-header"> {/* Added specific header class back for title color */}
-          <h2 id="inventoryModalTitle" className="text-xl font-bold">我的背包</h2> {/* Specific color applied by .inventory-modal-content .modal-header-base h2 */}
-          <button onClick={onClose} className="modal-close-button-base" aria-label="关闭背包">
+    <div
+      className="modal-overlay-base"
+      onClick={onClose}
+      role="dialog"
+      aria-modal="true"
+      aria-labelledby="inventoryModalTitle"
+    >
+      <div
+        className="inventory-modal-content modal-content-base max-w-md"
+        onClick={e => e.stopPropagation()}
+      >
+        <div className="modal-header-base inventory-modal-header">
+          {' '}
+          {/* Added specific header class back for title color */}
+          <h2 id="inventoryModalTitle" className="text-xl font-bold">
+            我的背包
+          </h2>{' '}
+          {/* Specific color applied by .inventory-modal-content .modal-header-base h2 */}
+          <button
+            onClick={onClose}
+            className="modal-close-button-base"
+            aria-label="关闭背包"
+          >
             &times;
           </button>
         </div>
@@ -42,11 +65,14 @@ const InventoryModal: React.FC<InventoryModalProps> = ({ isOpen, onClose, invent
           ) : (
             <ul className="space-y-2.5">
               {inventory.map(item => (
-                <li 
-                  key={item.id} 
+                <li
+                  key={item.id}
                   className="p-3 bg-purple-100/70 rounded-lg shadow border border-purple-300/50 cursor-pointer transition-all hover:bg-purple-200/80"
                   onClick={() => toggleItemExpansion(item.id)}
-                  onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') toggleItemExpansion(item.id);}}
+                  onKeyDown={e => {
+                    if (e.key === 'Enter' || e.key === ' ')
+                      toggleItemExpansion(item.id);
+                  }}
                   tabIndex={0}
                   aria-expanded={expandedItemId === item.id}
                   aria-controls={`item-desc-${item.id}`}
@@ -57,25 +83,40 @@ const InventoryModal: React.FC<InventoryModalProps> = ({ isOpen, onClose, invent
                         src={item.imageUrl}
                         alt={item.name}
                         className="w-10 h-10 mr-3 mt-0.5 object-contain rounded bg-white/50 p-0.5 border border-purple-200/70 shadow-sm flex-shrink-0"
-                        onError={(e) => handleImageError(e)} // Pass event to handler
+                        onError={e => handleImageError(e)} // Pass event to handler
                       />
                     )}
                     <div className="flex-grow">
                       <div className="flex justify-between items-baseline">
-                        <span className="font-semibold text-gray-800">{item.name}</span>
-                        <span className="text-sm text-slate-600">数量: {item.quantity}</span>
+                        <span className="font-semibold text-gray-800">
+                          {item.name}
+                        </span>
+                        <span className="text-sm text-slate-600">
+                          数量: {item.quantity}
+                        </span>
                       </div>
                       {item.effectText && (
-                        <p className="text-sm text-indigo-600 font-medium mt-0.5">{item.effectText}</p>
+                        <p className="text-sm text-indigo-600 font-medium mt-0.5">
+                          {item.effectText}
+                        </p>
                       )}
-                       {expandedItemId !== item.id && !item.effectText && item.description && ( // Only show "click for details" if there is a description
-                        <p className="text-xs text-slate-500 italic mt-1">点击查看详情</p>
-                      )}
+                      {expandedItemId !== item.id &&
+                        !item.effectText &&
+                        item.description && ( // Only show "click for details" if there is a description
+                          <p className="text-xs text-slate-500 italic mt-1">
+                            点击查看详情
+                          </p>
+                        )}
                     </div>
                   </div>
                   {expandedItemId === item.id && item.description && (
-                    <div id={`item-desc-${item.id}`} className="mt-2 pt-2 border-t border-purple-300/40">
-                      <p className="text-xs text-slate-500 italic">{item.description}</p>
+                    <div
+                      id={`item-desc-${item.id}`}
+                      className="mt-2 pt-2 border-t border-purple-300/40"
+                    >
+                      <p className="text-xs text-slate-500 italic">
+                        {item.description}
+                      </p>
                     </div>
                   )}
                 </li>

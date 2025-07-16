@@ -1,11 +1,12 @@
-
 import React from 'react';
 
 interface NPCCommunicationFABProps {
   onOpen: () => void;
 }
 
-const NPCCommunicationFAB: React.FC<NPCCommunicationFABProps> = ({ onOpen }) => {
+const NPCCommunicationFAB: React.FC<NPCCommunicationFABProps> = ({
+  onOpen,
+}) => {
   return (
     <button
       onClick={onOpen}

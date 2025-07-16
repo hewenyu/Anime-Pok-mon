@@ -1,56 +1,55 @@
-
-
-
-
 // Added types for AI Customization Intent Classification
 export type CustomizationIntentType =
-  | "CREATE_FULL_PROFILE"          // User wants a complete profile generated based on a theme/description.
-  | "SUGGEST_POKEMON"              // User wants a Pokémon suggestion.
-  | "SUGGEST_ITEM"                 // User wants an item suggestion.
-  | "MODIFY_PROFILE_FIELD"         // User wants to change a specific profile field (name, age, gender, description).
-  | "MODIFY_OBJECTIVE"             // User wants to change the current objective.
-  | "MODIFY_LOCATION"              // User wants to change the current location.
-  | "MODIFY_MONEY"                 // User wants to change the starting money.
-  | "MODIFY_GAME_START_TIME"       // User wants to change the game's starting date and time (e.g., via chat).
-  | "SUGGEST_GAME_START_TIME_BASED_ON_PROFILE" // User clicked button to get AI time suggestion based on current form.
-  | "MODIFY_ITEM_QUANTITY"         // User wants to change the quantity of an existing item (not yet fully supported by UI for assistant to initiate).
-  | "REQUEST_RANDOM_DESCRIPTION"   // User specifically asks for a random description (distinct from general profile field modification).
-  | "GENERAL_CHAT_OR_CLARIFICATION" // User is asking a question, making a general statement, or input is unclear.
-  | "UNKNOWN_INTENT";              // Classifier could not determine intent.
+  | 'CREATE_FULL_PROFILE' // User wants a complete profile generated based on a theme/description.
+  | 'SUGGEST_POKEMON' // User wants a Pokémon suggestion.
+  | 'SUGGEST_ITEM' // User wants an item suggestion.
+  | 'MODIFY_PROFILE_FIELD' // User wants to change a specific profile field (name, age, gender, description).
+  | 'MODIFY_OBJECTIVE' // User wants to change the current objective.
+  | 'MODIFY_LOCATION' // User wants to change the current location.
+  | 'MODIFY_MONEY' // User wants to change the starting money.
+  | 'MODIFY_GAME_START_TIME' // User wants to change the game's starting date and time (e.g., via chat).
+  | 'SUGGEST_GAME_START_TIME_BASED_ON_PROFILE' // User clicked button to get AI time suggestion based on current form.
+  | 'MODIFY_ITEM_QUANTITY' // User wants to change the quantity of an existing item (not yet fully supported by UI for assistant to initiate).
+  | 'REQUEST_RANDOM_DESCRIPTION' // User specifically asks for a random description (distinct from general profile field modification).
+  | 'GENERAL_CHAT_OR_CLARIFICATION' // User is asking a question, making a general statement, or input is unclear.
+  | 'UNKNOWN_INTENT'; // Classifier could not determine intent.
 
 export interface ProfileDataForTimeSuggestion {
-    name?: string;
-    description?: string;
-    objective?: string;
-    location?: string;
-    pokemonNames?: string[]; // Just names or key characteristics
-    itemNames?: string[];    // Just names
+  name?: string;
+  description?: string;
+  objective?: string;
+  location?: string;
+  pokemonNames?: string[]; // Just names or key characteristics
+  itemNames?: string[]; // Just names
 }
 
 export interface ClassifiedIntent {
   intent: CustomizationIntentType;
   params?: {
-    theme?: string;                 // For CREATE_FULL_PROFILE
-    pokemonType?: PokemonType;      // For SUGGEST_POKEMON
-    pokemonName?: string;           // For SUGGEST_POKEMON (if specified by user)
-    itemName?: string;              // For SUGGEST_ITEM or MODIFY_ITEM_QUANTITY
-    quantity?: number;              // For MODIFY_ITEM_QUANTITY or SUGGEST_ITEM
-    fieldName?: keyof PlayerProfile | 'currentObjective' | 'currentLocationDescription' | 'money'; // For MODIFY_PROFILE_FIELD and its variants
+    theme?: string; // For CREATE_FULL_PROFILE
+    pokemonType?: PokemonType; // For SUGGEST_POKEMON
+    pokemonName?: string; // For SUGGEST_POKEMON (if specified by user)
+    itemName?: string; // For SUGGEST_ITEM or MODIFY_ITEM_QUANTITY
+    quantity?: number; // For MODIFY_ITEM_QUANTITY or SUGGEST_ITEM
+    fieldName?:
+      | keyof PlayerProfile
+      | 'currentObjective'
+      | 'currentLocationDescription'
+      | 'money'; // For MODIFY_PROFILE_FIELD and its variants
     fieldValue?: string | number | PlayerGender; // For MODIFY_PROFILE_FIELD
     // For MODIFY_GAME_START_TIME - numerical values expected after AI parsing user's natural language
-    year?: number;                  // e.g., 2025, -100 (for 101 BC)
-    month?: number;                 // 1-12
-    day?: number;                   // 1-31
-    hour?: number;                  // 0-23
-    minute?: number;                // 0-59
+    year?: number; // e.g., 2025, -100 (for 101 BC)
+    month?: number; // 1-12
+    day?: number; // 1-31
+    hour?: number; // 0-23
+    minute?: number; // 0-59
     // For SUGGEST_GAME_START_TIME_BASED_ON_PROFILE (sent from client to AI service)
     currentProfileDataForTimeSuggestion?: ProfileDataForTimeSuggestion;
   };
-  originalQuery: string;          // The user's full original input text.
-  confidence?: number;            // Optional: classifier's confidence in the intent.
-  feedbackToUser?: string;        // Optional: message if intent is unclear or params are missing.
+  originalQuery: string; // The user's full original input text.
+  confidence?: number; // Optional: classifier's confidence in the intent.
+  feedbackToUser?: string; // Optional: message if intent is unclear or params are missing.
 }
-
 
 export enum PokemonType {
   NORMAL = '一般',
@@ -109,24 +108,30 @@ export interface ActiveStatusCondition {
 }
 
 export type MoveEffectType =
-  | 'STATUS'          // Applies a status condition (PARALYZED, POISONED, etc.)
-  | 'STAT_CHANGE'     // Changes one or more stats (ATTACK up, DEFENSE down, etc.)
-  | 'HEAL'            // Heals the target (usually SELF)
-  | 'DAMAGE_HEAL'     // Deals damage and heals user based on damage dealt (e.g., Absorb)
-  | 'RECOIL_PERCENT'  // User takes recoil damage based on % of damage dealt
-  | 'RECOIL_FIXED'    // User takes recoil damage based on % of their max HP
-  | 'MULTI_HIT'       // Move hits multiple times (e.g., Double Slap)
-  | 'FLINCH'          // Chance to make the target flinch if user moves first
-  | 'FIXED_DAMAGE'    // Deals a fixed amount of damage (e.g., Dragon Rage)
-  | 'OHKO'            // One-Hit KO move (e.g., Fissure)
-  | 'FIELD_EFFECT'    // Modifies the battle field (e.g., Stealth Rock, Tailwind) - advanced
+  | 'STATUS' // Applies a status condition (PARALYZED, POISONED, etc.)
+  | 'STAT_CHANGE' // Changes one or more stats (ATTACK up, DEFENSE down, etc.)
+  | 'HEAL' // Heals the target (usually SELF)
+  | 'DAMAGE_HEAL' // Deals damage and heals user based on damage dealt (e.g., Absorb)
+  | 'RECOIL_PERCENT' // User takes recoil damage based on % of damage dealt
+  | 'RECOIL_FIXED' // User takes recoil damage based on % of their max HP
+  | 'MULTI_HIT' // Move hits multiple times (e.g., Double Slap)
+  | 'FLINCH' // Chance to make the target flinch if user moves first
+  | 'FIXED_DAMAGE' // Deals a fixed amount of damage (e.g., Dragon Rage)
+  | 'OHKO' // One-Hit KO move (e.g., Fissure)
+  | 'FIELD_EFFECT' // Modifies the battle field (e.g., Stealth Rock, Tailwind) - advanced
   | 'PRIORITY_CHANGE' // Affects move priority (e.g., Quick Attack is +1) - can be intrinsic to move
-  | 'NO_EFFECT';      // No additional effect other than damage.
-
+  | 'NO_EFFECT'; // No additional effect other than damage.
 
 export interface MoveEffect {
   type: MoveEffectType;
-  target: 'SELF' | 'OPPONENT' | 'ALL_OPPONENTS' | 'ALL_ALLIES' | 'FIELD_PLAYER' | 'FIELD_OPPONENT' | 'FIELD_BOTH';
+  target:
+    | 'SELF'
+    | 'OPPONENT'
+    | 'ALL_OPPONENTS'
+    | 'ALL_ALLIES'
+    | 'FIELD_PLAYER'
+    | 'FIELD_OPPONENT'
+    | 'FIELD_BOTH';
   chance?: number; // Probability of the effect occurring (0.0 to 1.0)
   statusCondition?: StatusCondition; // Which status to apply if type is 'STATUS'
   statChanges?: Array<{ stat: Stat; stage: number }>; // For 'STAT_CHANGE', e.g., [{ stat: Stat.ATTACK, stage: -1 }]
@@ -139,7 +144,6 @@ export interface MoveEffect {
   multiHitMax?: number; // For 'MULTI_HIT'.
   effectString?: string; // Chinese description of the effect, e.g., "使对手麻痹"
 }
-
 
 export interface IVs {
   hp: number;
@@ -232,11 +236,15 @@ export interface InventoryItem {
   // Battle-specific properties
   canUseInBattle?: boolean;
   targetType?: 'SELF_TEAM' | 'ENEMY' | 'SELF_ACTIVE'; // Defines who the item can target in battle
-  effect?: ItemEffect // More detailed effect definition for battle logic
+  effect?: ItemEffect; // More detailed effect definition for battle logic
 }
 
 // Example ItemEffect (can be expanded)
-export type ItemEffectType = 'HEAL_HP' | 'CURE_STATUS' | 'STAT_BOOST_TEMP' | 'CATCH_POKEMON';
+export type ItemEffectType =
+  | 'HEAL_HP'
+  | 'CURE_STATUS'
+  | 'STAT_BOOST_TEMP'
+  | 'CATCH_POKEMON';
 export interface ItemEffect {
   type: ItemEffectType;
   amount?: number; // e.g., HP restored, or stat stage increase
@@ -244,7 +252,6 @@ export interface ItemEffect {
   // For CATCH_POKEMON
   ballBonus?: number;
 }
-
 
 export interface AIStoryChoice {
   text: string;
@@ -257,19 +264,25 @@ export interface ChatHistoryEntry {
   timestamp: number;
   speaker: string;
   narrative: string;
-  type: 'static' | 'ai' | 'player_input' | 'system' | 'npc_dialogue' | 'assistant_suggestion';
-  
+  type:
+    | 'static'
+    | 'ai'
+    | 'player_input'
+    | 'system'
+    | 'npc_dialogue'
+    | 'assistant_suggestion';
+
   // Fields specific to assistant_suggestion type
   suggestedPokemonForConfirmation?: Pokemon;
   suggestedItemForConfirmation?: InventoryItem;
-  suggestedLocationDetails?: { newLocation: string; mapData?: string; };
-  
+  suggestedLocationDetails?: { newLocation: string; mapData?: string };
+
   // Field for main AI response that has choices, or an assistant_suggestion that presents choices
   confirmationChoices?: AIStoryChoice[];
   isClickableSuggestion?: boolean; // e.g. for Pokémon card to open detail modal
 
   // Fields for AI responses that contain structured data (mainly from assistant)
-  events?: AIEventTrigger[]; 
+  events?: AIEventTrigger[];
   suggestedFullProfileData?: FullProfileSuggestionData;
 }
 
@@ -295,7 +308,7 @@ export type AIEventTriggerType =
   | 'UPDATE_NPC_RELATIONSHIP'
   | 'SET_PLAYER_PROFILE'
   | 'PRESENT_SUGGESTED_POKEMON_DETAILS' // For customization assistant to show details before adding
-  | 'PRESENT_SUGGESTED_ITEM_DETAILS'    // For customization assistant
+  | 'PRESENT_SUGGESTED_ITEM_DETAILS' // For customization assistant
   | 'PRESENT_SUGGESTED_LOCATION_DETAILS'; // For customization assistant
 
 export interface AIEventTrigger {
@@ -312,9 +325,8 @@ export interface AIEventTrigger {
   npcId?: string; // For UPDATE_NPC_RELATIONSHIP
   newRelationshipStatus?: string; // For UPDATE_NPC_RELATIONSHIP
   profileDetails?: Partial<PlayerProfile>; // For SET_PLAYER_PROFILE
-  suggestedLocationDetails?: { newLocation: string; mapData?: string; }; // For PRESENT_SUGGESTED_LOCATION_DETAILS
+  suggestedLocationDetails?: { newLocation: string; mapData?: string }; // For PRESENT_SUGGESTED_LOCATION_DETAILS
 }
-
 
 // Contains all fields from PlayerProfile, plus objective, location, and money.
 // Used by the AI Customization Assistant when suggesting a full profile.
@@ -333,11 +345,11 @@ export interface AIStoryResponse {
   events?: AIEventTrigger[]; // Game state changes or suggestions. All user-facing text in event details must be Chinese.
   suggestedPlayerReplies?: AIStoryChoice[]; // For NPC chat, suggestions for player input. All 'text' fields must be Chinese.
   itemActionSuggestions?: AIStoryChoice[]; // For battle item usage suggestions.
-  
+
   // Specific fields for certain actions:
   regeneratedPokemonImageUrl?: string; // For USER_REQUESTS_POKEMON_IMAGE_REGENERATION.
   pokemonImageErrorInstanceId?: string; // Context, client-provided.
-  
+
   // For AI Customization Assistant (especially for full profile suggestions):
   suggestedFullProfileData?: FullProfileSuggestionData; // All text fields (name, description, objective, location etc.) must be Chinese.
 }
@@ -372,7 +384,7 @@ export interface GameState {
   inventory: InventoryItem[];
   money: number;
   gameMode: GameMode;
-  currentGameTime: number; 
+  currentGameTime: number;
 
   currentAIScene: AIStoryResponse | null; // For main game story.
   aiLoadingStatus: LoadingStatus;
@@ -399,11 +411,10 @@ export interface GameState {
   // Store for the AI's suggested start time from profile generation (Unix ms timestamp)
   aiSuggestedGameStartTime?: number;
 
-
   // Specific state for the AI Customization Assistant
   customizationAssistantResponse: AIStoryResponse | null; // Responses from the assistant.
   assistantChatJustRefreshed?: boolean; // Flag to indicate if the assistant chat was just refreshed/cleared
-  
+
   // Context for image regeneration
   pokemonInstanceIdToRegenerate?: string;
   pokemonNameToRegenerate?: string;
@@ -414,7 +425,9 @@ export type GameStateUpdater = React.Dispatch<React.SetStateAction<GameState>>;
 export interface StoryChoice {
   text: string;
   nextSegmentId?: string;
-  action?: (updateGameState: (updater: (prevState: GameState) => GameState) => void) => void;
+  action?: (
+    updateGameState: (updater: (prevState: GameState) => GameState) => void
+  ) => void;
   disabled?: (gameState: GameState) => boolean;
   actionTag?: string;
   isBattleTrigger?: boolean;
@@ -430,11 +443,15 @@ export interface BattleTrigger {
 export interface StorySegment {
   id: string;
   speaker?: string | ((playerProfile: PlayerProfile) => string);
-  text: string | ((playerProfile: PlayerProfile, playerTeam: Pokemon[]) => string);
+  text:
+    | string
+    | ((playerProfile: PlayerProfile, playerTeam: Pokemon[]) => string);
   imageUrl?: string;
   choices?: StoryChoice[];
   nextSegmentId?: string;
-  onLoad?: (updateGameState: (updater: (prevState: GameState) => GameState) => void) => void;
+  onLoad?: (
+    updateGameState: (updater: (prevState: GameState) => GameState) => void
+  ) => void;
   triggerBattle?: BattleTrigger;
   isAIHandoff?: boolean;
   actionTag?: string;
@@ -448,11 +465,15 @@ export type AICustomizationScreenActionTag =
 
 // Deprecated, will be handled by intent classification.
 // Keeping for now to avoid breaking existing calls until refactor is complete.
-export type AICustomizationAssistantActionTag =
-  | 'ASSIST_PROFILE_CUSTOMIZATION';
+export type AICustomizationAssistantActionTag = 'ASSIST_PROFILE_CUSTOMIZATION';
 
-
-export type BattleChatMessageType = 'player_command_echo' | 'player_action_log' | 'enemy_action_log' | 'system_message' | 'ai_feedback' | 'ai_item_action_suggestion';
+export type BattleChatMessageType =
+  | 'player_command_echo'
+  | 'player_action_log'
+  | 'enemy_action_log'
+  | 'system_message'
+  | 'ai_feedback'
+  | 'ai_item_action_suggestion';
 export interface BattleChatMessage {
   id: string;
   speaker: string;
@@ -463,18 +484,18 @@ export interface BattleChatMessage {
 }
 
 export type ParsedBattleActionType =
-  | "USE_MOVE"
-  | "USE_ITEM"
-  | "USE_ITEM_CONFIRMED" // Internal step after AI suggestion or direct click
-  | "SWITCH_POKEMON"
-  | "RUN"
-  | "UNKNOWN"
-  | "AMBIGUOUS"
-  | "INVALID_TARGET"
-  | "INVALID_MOVE"
-  | "INVALID_ITEM"
-  | "NOT_ENOUGH_PP"
-  | "CANNOT_SWITCH_TO_FAINTED_OR_ACTIVE";
+  | 'USE_MOVE'
+  | 'USE_ITEM'
+  | 'USE_ITEM_CONFIRMED' // Internal step after AI suggestion or direct click
+  | 'SWITCH_POKEMON'
+  | 'RUN'
+  | 'UNKNOWN'
+  | 'AMBIGUOUS'
+  | 'INVALID_TARGET'
+  | 'INVALID_MOVE'
+  | 'INVALID_ITEM'
+  | 'NOT_ENOUGH_PP'
+  | 'CANNOT_SWITCH_TO_FAINTED_OR_ACTIVE';
 
 export interface ParsedBattleAction {
   actionType: ParsedBattleActionType;
@@ -484,7 +505,7 @@ export interface ParsedBattleAction {
   targetPokemonInstanceId?: string; // For USE_MOVE, USE_ITEM, USE_ITEM_CONFIRMED, SWITCH_POKEMON. Can be "enemy" for items.
   feedbackMessage?: string; // For error/feedback types
   isCatchAttempt?: boolean; // For USE_ITEM_CONFIRMED if item is a Poke Ball
-  catchSuccess?: boolean;  // For USE_ITEM_CONFIRMED if item is a Poke Ball and successful
+  catchSuccess?: boolean; // For USE_ITEM_CONFIRMED if item is a Poke Ball and successful
 }
 
 export interface BattleCommandParseContext {

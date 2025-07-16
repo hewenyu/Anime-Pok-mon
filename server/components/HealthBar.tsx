@@ -1,4 +1,3 @@
-
 import React from 'react';
 
 interface HealthBarProps {
@@ -8,7 +7,7 @@ interface HealthBarProps {
 
 const HealthBar: React.FC<HealthBarProps> = ({ currentHp, maxHp }) => {
   const percentage = maxHp > 0 ? Math.max(0, (currentHp / maxHp) * 100) : 0;
-  
+
   let barColorClass = 'bg-green-500'; // Default green
   if (percentage <= 20) {
     barColorClass = 'bg-red-600'; // Critical red

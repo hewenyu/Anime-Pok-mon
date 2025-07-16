@@ -1,7 +1,23 @@
-
-
 // This comment is added to potentially help refresh module parsing.
-import { Pokemon, PokemonType, GameState, GameMode, StorySegment, PlayerProfile, IVs, NPC, AIStoryChoice, PokemonMoveInstance, StatusCondition, Stat, MoveEffect, MoveEffectType, CustomizationIntentType, ClassifiedIntent, ProfileDataForTimeSuggestion } from './types'; // Added CustomizationIntentType, ClassifiedIntent, ProfileDataForTimeSuggestion
+import {
+  Pokemon,
+  PokemonType,
+  GameState,
+  GameMode,
+  StorySegment,
+  PlayerProfile,
+  IVs,
+  NPC,
+  AIStoryChoice,
+  PokemonMoveInstance,
+  StatusCondition,
+  Stat,
+  MoveEffect,
+  MoveEffectType,
+  CustomizationIntentType,
+  ClassifiedIntent,
+  ProfileDataForTimeSuggestion,
+} from './types'; // Added CustomizationIntentType, ClassifiedIntent, ProfileDataForTimeSuggestion
 
 // Record mapping PokemonType to Tailwind CSS classes for styling type badges.
 export const TYPE_COLORS: Record<PokemonType, string> = {
@@ -26,45 +42,239 @@ export const TYPE_COLORS: Record<PokemonType, string> = {
 };
 
 // Defines type effectiveness multipliers. Key is attacking type, nested key is defending type.
-export const TYPE_EFFECTIVENESS: Record<PokemonType, Partial<Record<PokemonType, number>>> = {
-  [PokemonType.FIRE]: { [PokemonType.GRASS]: 2, [PokemonType.ICE]: 2, [PokemonType.BUG]: 2, [PokemonType.STEEL]: 2, [PokemonType.WATER]: 0.5, [PokemonType.ROCK]: 0.5, [PokemonType.FIRE]: 0.5, [PokemonType.DRAGON]: 0.5 },
-  [PokemonType.WATER]: { [PokemonType.FIRE]: 2, [PokemonType.GROUND]: 2, [PokemonType.ROCK]: 2, [PokemonType.GRASS]: 0.5, [PokemonType.WATER]: 0.5, [PokemonType.DRAGON]: 0.5 },
-  [PokemonType.GRASS]: { [PokemonType.WATER]: 2, [PokemonType.GROUND]: 2, [PokemonType.ROCK]: 2, [PokemonType.FIRE]: 0.5, [PokemonType.POISON]: 0.5, [PokemonType.FLYING]: 0.5, [PokemonType.BUG]: 0.5, [PokemonType.GRASS]: 0.5, [PokemonType.DRAGON]: 0.5, [PokemonType.STEEL]: 0.5 },
-  [PokemonType.ELECTRIC]: { [PokemonType.WATER]: 2, [PokemonType.FLYING]: 2, [PokemonType.GRASS]: 0.5, [PokemonType.ELECTRIC]: 0.5, [PokemonType.DRAGON]: 0.5, [PokemonType.GROUND]: 0 },
-  [PokemonType.NORMAL]: { [PokemonType.ROCK]: 0.5, [PokemonType.STEEL]: 0.5, [PokemonType.GHOST]: 0 },
-  [PokemonType.FIGHTING]: { [PokemonType.NORMAL]: 2, [PokemonType.ICE]: 2, [PokemonType.ROCK]: 2, [PokemonType.DARK]: 2, [PokemonType.STEEL]: 2, [PokemonType.POISON]: 0.5, [PokemonType.FLYING]: 0.5, [PokemonType.PSYCHIC]: 0.5, [PokemonType.BUG]: 0.5, [PokemonType.FAIRY]: 0.5, [PokemonType.GHOST]: 0 },
-  [PokemonType.FLYING]: { [PokemonType.GRASS]: 2, [PokemonType.FIGHTING]: 2, [PokemonType.BUG]: 2, [PokemonType.ROCK]: 0.5, [PokemonType.STEEL]: 0.5, [PokemonType.ELECTRIC]: 0.5 },
-  [PokemonType.PSYCHIC]: { [PokemonType.FIGHTING]: 2, [PokemonType.POISON]: 2, [PokemonType.STEEL]: 0.5, [PokemonType.PSYCHIC]: 0.5, [PokemonType.DARK]: 0 },
-  [PokemonType.ROCK]: { [PokemonType.FIRE]: 2, [PokemonType.ICE]: 2, [PokemonType.FLYING]: 2, [PokemonType.BUG]: 2, [PokemonType.FIGHTING]: 0.5, [PokemonType.GROUND]: 0.5, [PokemonType.STEEL]: 0.5 },
-  [PokemonType.GROUND]: { [PokemonType.FIRE]: 2, [PokemonType.ELECTRIC]: 2, [PokemonType.POISON]: 2, [PokemonType.ROCK]: 2, [PokemonType.STEEL]: 2, [PokemonType.GRASS]: 0.5, [PokemonType.BUG]: 0.5, [PokemonType.FLYING]: 0},
-  [PokemonType.ICE]: { [PokemonType.GRASS]: 2, [PokemonType.GROUND]: 2, [PokemonType.FLYING]: 2, [PokemonType.DRAGON]: 2, [PokemonType.FIRE]: 0.5, [PokemonType.WATER]: 0.5, [PokemonType.ICE]: 0.5, [PokemonType.STEEL]: 0.5 },
-  [PokemonType.BUG]: { [PokemonType.GRASS]: 2, [PokemonType.PSYCHIC]: 2, [PokemonType.DARK]: 2, [PokemonType.FIRE]: 0.5, [PokemonType.FIGHTING]: 0.5, [PokemonType.POISON]: 0.5, [PokemonType.FLYING]: 0.5, [PokemonType.GHOST]: 0.5, [PokemonType.STEEL]: 0.5, [PokemonType.FAIRY]: 0.5 },
-  [PokemonType.POISON]: { [PokemonType.GRASS]: 2, [PokemonType.FAIRY]: 2, [PokemonType.POISON]: 0.5, [PokemonType.GROUND]: 0.5, [PokemonType.ROCK]: 0.5, [PokemonType.GHOST]: 0.5, [PokemonType.STEEL]: 0 },
-  [PokemonType.GHOST]: { [PokemonType.PSYCHIC]: 2, [PokemonType.GHOST]: 2, [PokemonType.DARK]: 0.5, [PokemonType.NORMAL]: 0 },
-  [PokemonType.STEEL]: { [PokemonType.ICE]: 2, [PokemonType.ROCK]: 2, [PokemonType.FAIRY]: 2, [PokemonType.FIRE]: 0.5, [PokemonType.WATER]: 0.5, [PokemonType.ELECTRIC]: 0.5, [PokemonType.STEEL]: 0.5 },
-  [PokemonType.DRAGON]: { [PokemonType.DRAGON]: 2, [PokemonType.STEEL]: 0.5, [PokemonType.FAIRY]: 0 },
-  [PokemonType.DARK]: { [PokemonType.PSYCHIC]: 2, [PokemonType.GHOST]: 2, [PokemonType.FIGHTING]: 0.5, [PokemonType.DARK]: 0.5, [PokemonType.FAIRY]: 0.5 },
-  [PokemonType.FAIRY]: { [PokemonType.FIGHTING]: 2, [PokemonType.DRAGON]: 2, [PokemonType.DARK]: 2, [PokemonType.FIRE]: 0.5, [PokemonType.POISON]: 0.5, [PokemonType.STEEL]: 0.5 },
+export const TYPE_EFFECTIVENESS: Record<
+  PokemonType,
+  Partial<Record<PokemonType, number>>
+> = {
+  [PokemonType.FIRE]: {
+    [PokemonType.GRASS]: 2,
+    [PokemonType.ICE]: 2,
+    [PokemonType.BUG]: 2,
+    [PokemonType.STEEL]: 2,
+    [PokemonType.WATER]: 0.5,
+    [PokemonType.ROCK]: 0.5,
+    [PokemonType.FIRE]: 0.5,
+    [PokemonType.DRAGON]: 0.5,
+  },
+  [PokemonType.WATER]: {
+    [PokemonType.FIRE]: 2,
+    [PokemonType.GROUND]: 2,
+    [PokemonType.ROCK]: 2,
+    [PokemonType.GRASS]: 0.5,
+    [PokemonType.WATER]: 0.5,
+    [PokemonType.DRAGON]: 0.5,
+  },
+  [PokemonType.GRASS]: {
+    [PokemonType.WATER]: 2,
+    [PokemonType.GROUND]: 2,
+    [PokemonType.ROCK]: 2,
+    [PokemonType.FIRE]: 0.5,
+    [PokemonType.POISON]: 0.5,
+    [PokemonType.FLYING]: 0.5,
+    [PokemonType.BUG]: 0.5,
+    [PokemonType.GRASS]: 0.5,
+    [PokemonType.DRAGON]: 0.5,
+    [PokemonType.STEEL]: 0.5,
+  },
+  [PokemonType.ELECTRIC]: {
+    [PokemonType.WATER]: 2,
+    [PokemonType.FLYING]: 2,
+    [PokemonType.GRASS]: 0.5,
+    [PokemonType.ELECTRIC]: 0.5,
+    [PokemonType.DRAGON]: 0.5,
+    [PokemonType.GROUND]: 0,
+  },
+  [PokemonType.NORMAL]: {
+    [PokemonType.ROCK]: 0.5,
+    [PokemonType.STEEL]: 0.5,
+    [PokemonType.GHOST]: 0,
+  },
+  [PokemonType.FIGHTING]: {
+    [PokemonType.NORMAL]: 2,
+    [PokemonType.ICE]: 2,
+    [PokemonType.ROCK]: 2,
+    [PokemonType.DARK]: 2,
+    [PokemonType.STEEL]: 2,
+    [PokemonType.POISON]: 0.5,
+    [PokemonType.FLYING]: 0.5,
+    [PokemonType.PSYCHIC]: 0.5,
+    [PokemonType.BUG]: 0.5,
+    [PokemonType.FAIRY]: 0.5,
+    [PokemonType.GHOST]: 0,
+  },
+  [PokemonType.FLYING]: {
+    [PokemonType.GRASS]: 2,
+    [PokemonType.FIGHTING]: 2,
+    [PokemonType.BUG]: 2,
+    [PokemonType.ROCK]: 0.5,
+    [PokemonType.STEEL]: 0.5,
+    [PokemonType.ELECTRIC]: 0.5,
+  },
+  [PokemonType.PSYCHIC]: {
+    [PokemonType.FIGHTING]: 2,
+    [PokemonType.POISON]: 2,
+    [PokemonType.STEEL]: 0.5,
+    [PokemonType.PSYCHIC]: 0.5,
+    [PokemonType.DARK]: 0,
+  },
+  [PokemonType.ROCK]: {
+    [PokemonType.FIRE]: 2,
+    [PokemonType.ICE]: 2,
+    [PokemonType.FLYING]: 2,
+    [PokemonType.BUG]: 2,
+    [PokemonType.FIGHTING]: 0.5,
+    [PokemonType.GROUND]: 0.5,
+    [PokemonType.STEEL]: 0.5,
+  },
+  [PokemonType.GROUND]: {
+    [PokemonType.FIRE]: 2,
+    [PokemonType.ELECTRIC]: 2,
+    [PokemonType.POISON]: 2,
+    [PokemonType.ROCK]: 2,
+    [PokemonType.STEEL]: 2,
+    [PokemonType.GRASS]: 0.5,
+    [PokemonType.BUG]: 0.5,
+    [PokemonType.FLYING]: 0,
+  },
+  [PokemonType.ICE]: {
+    [PokemonType.GRASS]: 2,
+    [PokemonType.GROUND]: 2,
+    [PokemonType.FLYING]: 2,
+    [PokemonType.DRAGON]: 2,
+    [PokemonType.FIRE]: 0.5,
+    [PokemonType.WATER]: 0.5,
+    [PokemonType.ICE]: 0.5,
+    [PokemonType.STEEL]: 0.5,
+  },
+  [PokemonType.BUG]: {
+    [PokemonType.GRASS]: 2,
+    [PokemonType.PSYCHIC]: 2,
+    [PokemonType.DARK]: 2,
+    [PokemonType.FIRE]: 0.5,
+    [PokemonType.FIGHTING]: 0.5,
+    [PokemonType.POISON]: 0.5,
+    [PokemonType.FLYING]: 0.5,
+    [PokemonType.GHOST]: 0.5,
+    [PokemonType.STEEL]: 0.5,
+    [PokemonType.FAIRY]: 0.5,
+  },
+  [PokemonType.POISON]: {
+    [PokemonType.GRASS]: 2,
+    [PokemonType.FAIRY]: 2,
+    [PokemonType.POISON]: 0.5,
+    [PokemonType.GROUND]: 0.5,
+    [PokemonType.ROCK]: 0.5,
+    [PokemonType.GHOST]: 0.5,
+    [PokemonType.STEEL]: 0,
+  },
+  [PokemonType.GHOST]: {
+    [PokemonType.PSYCHIC]: 2,
+    [PokemonType.GHOST]: 2,
+    [PokemonType.DARK]: 0.5,
+    [PokemonType.NORMAL]: 0,
+  },
+  [PokemonType.STEEL]: {
+    [PokemonType.ICE]: 2,
+    [PokemonType.ROCK]: 2,
+    [PokemonType.FAIRY]: 2,
+    [PokemonType.FIRE]: 0.5,
+    [PokemonType.WATER]: 0.5,
+    [PokemonType.ELECTRIC]: 0.5,
+    [PokemonType.STEEL]: 0.5,
+  },
+  [PokemonType.DRAGON]: {
+    [PokemonType.DRAGON]: 2,
+    [PokemonType.STEEL]: 0.5,
+    [PokemonType.FAIRY]: 0,
+  },
+  [PokemonType.DARK]: {
+    [PokemonType.PSYCHIC]: 2,
+    [PokemonType.GHOST]: 2,
+    [PokemonType.FIGHTING]: 0.5,
+    [PokemonType.DARK]: 0.5,
+    [PokemonType.FAIRY]: 0.5,
+  },
+  [PokemonType.FAIRY]: {
+    [PokemonType.FIGHTING]: 2,
+    [PokemonType.DRAGON]: 2,
+    [PokemonType.DARK]: 2,
+    [PokemonType.FIRE]: 0.5,
+    [PokemonType.POISON]: 0.5,
+    [PokemonType.STEEL]: 0.5,
+  },
 };
 
 // Stat stage modifiers used in battle calculations.
 export const STAT_STAGE_MULTIPLIERS: Record<number, number> = {
-  [-6]: 2/8, [-5]: 2/7, [-4]: 2/6, [-3]: 2/5, [-2]: 2/4, [-1]: 2/3,
+  [-6]: 2 / 8,
+  [-5]: 2 / 7,
+  [-4]: 2 / 6,
+  [-3]: 2 / 5,
+  [-2]: 2 / 4,
+  [-1]: 2 / 3,
   [0]: 1,
-  [1]: 3/2, [2]: 4/2, [3]: 5/2, [4]: 6/2, [5]: 7/2, [6]: 8/2,
+  [1]: 3 / 2,
+  [2]: 4 / 2,
+  [3]: 5 / 2,
+  [4]: 6 / 2,
+  [5]: 7 / 2,
+  [6]: 8 / 2,
 };
 
 // Information about status conditions, including display names, colors, and icons.
-export const STATUS_CONDITION_INFO: Record<StatusCondition, { shortName: string; longName?: string; colorClass?: string; icon?: string }> = {
+export const STATUS_CONDITION_INFO: Record<
+  StatusCondition,
+  { shortName: string; longName?: string; colorClass?: string; icon?: string }
+> = {
   [StatusCondition.NONE]: { shortName: '' },
-  [StatusCondition.PARALYZED]: { shortName: '麻痹', longName: '麻痹', colorClass: 'text-yellow-400 dark:text-yellow-300', icon: '⚡' },
-  [StatusCondition.POISONED]: { shortName: '中毒', longName: '中毒', colorClass: 'text-purple-400 dark:text-purple-300', icon: '☠️' },
-  [StatusCondition.BADLY_POISONED]: { shortName: '剧毒', longName: '剧毒', colorClass: 'text-purple-600 dark:text-purple-500', icon: '☣️' },
-  [StatusCondition.BURNED]: { shortName: '灼伤', longName: '灼伤', colorClass: 'text-red-400 dark:text-red-300', icon: '🔥' },
-  [StatusCondition.FROZEN]: { shortName: '冰冻', longName: '冰冻', colorClass: 'text-blue-300 dark:text-blue-200', icon: '❄️' },
-  [StatusCondition.ASLEEP]: { shortName: '睡眠', longName: '睡眠', colorClass: 'text-gray-400 dark:text-gray-300', icon: '💤' },
-  [StatusCondition.CONFUSED]: { shortName: '混乱', longName: '混乱', colorClass: 'text-pink-400 dark:text-pink-300', icon: '❓' },
-  [StatusCondition.FLINCHED]: { shortName: '畏缩', longName: '畏缩', colorClass: 'text-orange-400 dark:text-orange-300', icon: '!' },
+  [StatusCondition.PARALYZED]: {
+    shortName: '麻痹',
+    longName: '麻痹',
+    colorClass: 'text-yellow-400 dark:text-yellow-300',
+    icon: '⚡',
+  },
+  [StatusCondition.POISONED]: {
+    shortName: '中毒',
+    longName: '中毒',
+    colorClass: 'text-purple-400 dark:text-purple-300',
+    icon: '☠️',
+  },
+  [StatusCondition.BADLY_POISONED]: {
+    shortName: '剧毒',
+    longName: '剧毒',
+    colorClass: 'text-purple-600 dark:text-purple-500',
+    icon: '☣️',
+  },
+  [StatusCondition.BURNED]: {
+    shortName: '灼伤',
+    longName: '灼伤',
+    colorClass: 'text-red-400 dark:text-red-300',
+    icon: '🔥',
+  },
+  [StatusCondition.FROZEN]: {
+    shortName: '冰冻',
+    longName: '冰冻',
+    colorClass: 'text-blue-300 dark:text-blue-200',
+    icon: '❄️',
+  },
+  [StatusCondition.ASLEEP]: {
+    shortName: '睡眠',
+    longName: '睡眠',
+    colorClass: 'text-gray-400 dark:text-gray-300',
+    icon: '💤',
+  },
+  [StatusCondition.CONFUSED]: {
+    shortName: '混乱',
+    longName: '混乱',
+    colorClass: 'text-pink-400 dark:text-pink-300',
+    icon: '❓',
+  },
+  [StatusCondition.FLINCHED]: {
+    shortName: '畏缩',
+    longName: '畏缩',
+    colorClass: 'text-orange-400 dark:text-orange-300',
+    icon: '!',
+  },
 };
 
 // Initial state for the game.
@@ -78,13 +288,41 @@ export const INITIAL_GAME_STATE: GameState = {
     maxStamina: 100,
     energy: 100,
     maxEnergy: 100,
-    healthStatus: "健康",
+    healthStatus: '健康',
   },
   playerTeam: [],
-  inventory: [ // Example items for testing
-    { id: 'potion-1', name: '伤药', quantity: 3, description: '回复少量HP。', effectText: '回复20HP', canUseInBattle: true, targetType: 'SELF_TEAM', effect: { type: 'HEAL_HP', amount: 20 }},
-    { id: 'pokeball-1', name: '精灵球', quantity: 5, description: '用于捕捉宝可梦。', effectText: '尝试捕捉宝可梦', canUseInBattle: true, targetType: 'ENEMY', effect: {type: 'CATCH_POKEMON', ballBonus: 1}},
-    { id: 'superpotion-1', name: '好伤药', quantity: 1, description: '回复中量HP。', effectText: '回复50HP', canUseInBattle: true, targetType: 'SELF_TEAM', effect: { type: 'HEAL_HP', amount: 50 }}
+  inventory: [
+    // Example items for testing
+    {
+      id: 'potion-1',
+      name: '伤药',
+      quantity: 3,
+      description: '回复少量HP。',
+      effectText: '回复20HP',
+      canUseInBattle: true,
+      targetType: 'SELF_TEAM',
+      effect: { type: 'HEAL_HP', amount: 20 },
+    },
+    {
+      id: 'pokeball-1',
+      name: '精灵球',
+      quantity: 5,
+      description: '用于捕捉宝可梦。',
+      effectText: '尝试捕捉宝可梦',
+      canUseInBattle: true,
+      targetType: 'ENEMY',
+      effect: { type: 'CATCH_POKEMON', ballBonus: 1 },
+    },
+    {
+      id: 'superpotion-1',
+      name: '好伤药',
+      quantity: 1,
+      description: '回复中量HP。',
+      effectText: '回复50HP',
+      canUseInBattle: true,
+      targetType: 'SELF_TEAM',
+      effect: { type: 'HEAL_HP', amount: 50 },
+    },
   ],
   money: 0,
   gameMode: GameMode.CUSTOMIZE_RANDOM_START,
@@ -92,8 +330,8 @@ export const INITIAL_GAME_STATE: GameState = {
   aiSuggestedGameStartTime: undefined, // Store AI's suggestion for full profile
   currentAIScene: null,
   aiLoadingStatus: { status: 'idle' },
-  currentLocationDescription: "未知",
-  currentObjective: "正在生成初始身份...",
+  currentLocationDescription: '未知',
+  currentObjective: '正在生成初始身份...',
   currentAreaMap: null,
   globalAreaMap: {},
   pendingBattleDetails: undefined,
@@ -105,7 +343,6 @@ export const INITIAL_GAME_STATE: GameState = {
   pokemonInstanceIdToRegenerate: undefined,
   pokemonNameToRegenerate: undefined,
 };
-
 
 // --- START OF GENERAL RESPONSE FORMAT AND CRITICAL RULES (Used by multiple specialized prompts) ---
 const AI_RESPONSE_TYPES_DEFINITION = `
@@ -185,7 +422,6 @@ The \`quantity\` field (number) should also be provided within the event (e.g., 
 All item names, descriptions, and effect texts MUST be in Chinese.
 `;
 // --- END OF GENERAL RESPONSE FORMAT AND CRITICAL RULES ---
-
 
 // System prompt for the main game master AI.
 export const GEMINI_GAME_MASTER_SYSTEM_PROMPT = `
@@ -621,7 +857,6 @@ interface ProfileDataForTimeSuggestion {
 严格按照以上说明生成JSON。所有用户可见文本必须是中文。
 `;
 
-
 export const GEMINI_RANDOM_DESCRIPTION_GENERATOR_ASSISTANT_PROMPT = `
 你是一个AI助手，帮助玩家在“初始角色设定”界面生成一个随机的人物说明。
 你的回应必须是一个JSON对象，遵循 \`AIStoryResponse\` 接口。所有用户可见的文本必须是中文。
@@ -659,7 +894,6 @@ export const GEMINI_GENERAL_CUSTOMIZATION_CHAT_SYSTEM_PROMPT = `
 `;
 
 // --- END OF NEW AI CUSTOMIZATION ASSISTANT SYSTEM PROMPTS ---
-
 
 export const GEMINI_NPC_CHAT_SYSTEM_PROMPT = `
 你是日系动漫风格宝可梦文字冒险游戏中的一个NPC角色。
@@ -861,93 +1095,96 @@ AI Response:
 \`\`\`
 `;
 
-
 // Static story data segments.
 export const STORY_DATA: Record<string, StorySegment> = {
-  'INITIAL_PROFILE_PREPARATION': {
+  INITIAL_PROFILE_PREPARATION: {
     id: 'INITIAL_PROFILE_PREPARATION',
     speaker: '系统',
     text: '正在为你生成初始冒险设定，请稍候...',
     isAIHandoff: true,
     actionTag: 'GENERATE_FULL_RANDOM_PROFILE',
   },
-  'BATTLE_WON_DEFAULT': {
-      id: 'BATTLE_WON_DEFAULT',
-      speaker: '系统',
-      text: "你赢得了战斗！接下来会发生什么呢？",
-      isAIHandoff: true,
-      actionTag: 'PLAYER_WON_BATTLE',
+  BATTLE_WON_DEFAULT: {
+    id: 'BATTLE_WON_DEFAULT',
+    speaker: '系统',
+    text: '你赢得了战斗！接下来会发生什么呢？',
+    isAIHandoff: true,
+    actionTag: 'PLAYER_WON_BATTLE',
   },
-  'BATTLE_LOST_DEFAULT': {
-      id: 'BATTLE_LOST_DEFAULT',
-      speaker: '系统',
-      text: "你在战斗中失利了... 但冒险还将继续。",
-      onLoad: (updateGameState) => {
-          updateGameState(prev => ({
-              ...prev,
-               playerTeam: prev.playerTeam.map(p => ({
-                    ...p,
-                    // currentHp 和 isFainted 状态在战斗结束后应保持原样。
-                    // 不在此处自动恢复HP或清除昏厥状态。
-                    statStageModifiers: [], // 清除临时的能力等级变化
-                    statusConditions: [], // 清除所有异常状态 (或根据需要保留持久状态)
-               }))
-          }));
-      },
-      isAIHandoff: true,
-      actionTag: 'PLAYER_LOST_BATTLE',
+  BATTLE_LOST_DEFAULT: {
+    id: 'BATTLE_LOST_DEFAULT',
+    speaker: '系统',
+    text: '你在战斗中失利了... 但冒险还将继续。',
+    onLoad: updateGameState => {
+      updateGameState(prev => ({
+        ...prev,
+        playerTeam: prev.playerTeam.map(p => ({
+          ...p,
+          // currentHp 和 isFainted 状态在战斗结束后应保持原样。
+          // 不在此处自动恢复HP或清除昏厥状态。
+          statStageModifiers: [], // 清除临时的能力等级变化
+          statusConditions: [], // 清除所有异常状态 (或根据需要保留持久状态)
+        })),
+      }));
+    },
+    isAIHandoff: true,
+    actionTag: 'PLAYER_LOST_BATTLE',
   },
-  'PLAYER_RAN_AWAY': {
+  PLAYER_RAN_AWAY: {
     id: 'PLAYER_RAN_AWAY',
     speaker: '系统',
-    text: "你成功从战斗中脱离了。接下来做什么？",
+    text: '你成功从战斗中脱离了。接下来做什么？',
     isAIHandoff: true,
     actionTag: 'PLAYER_ESCAPED_BATTLE_CONTINUE',
   },
-   'CONTINUE_AFTER_IMAGE_REGEN': {
+  CONTINUE_AFTER_IMAGE_REGEN: {
     id: 'CONTINUE_AFTER_IMAGE_REGEN',
     speaker: '系统',
-    text: "图片已尝试更新。",
+    text: '图片已尝试更新。',
     isAIHandoff: true,
     actionTag: 'USER_ACKNOWLEDGED_IMAGE_REGEN',
   },
-   'ACKNOWLEDGE_AI_FORMAT_ERROR': {
+  ACKNOWLEDGE_AI_FORMAT_ERROR: {
     id: 'ACKNOWLEDGE_AI_FORMAT_ERROR',
     speaker: '系统消息',
     text: 'AI响应的格式似乎有些问题，导致内容无法正确显示。这通常是临时情况，请尝试重新操作或简化您的请求。',
     isAIHandoff: true,
     actionTag: 'CONTINUE_AFTER_STATIC_SEGMENT',
   },
-  'ACKNOWLEDGE_BATTLE_START': {
+  ACKNOWLEDGE_BATTLE_START: {
     id: 'ACKNOWLEDGE_BATTLE_START',
     speaker: '系统',
-    text: "战斗一触即发！",
+    text: '战斗一触即发！',
     // This segment is primarily a placeholder for the actionTag.
     // Game logic in useGameLogic.ts for ACKNOWLEDGE_BATTLE_START will handle transition.
   },
-   'CONFIRM_STATIC_BATTLE_SEGMENT': {
+  CONFIRM_STATIC_BATTLE_SEGMENT: {
     id: 'CONFIRM_STATIC_BATTLE_SEGMENT',
-    speaker: (playerProfile: PlayerProfile) => playerProfile.name || "你",
-    text: (playerProfile: PlayerProfile, playerTeam: Pokemon[]) => "战斗即将开始！",
-    choices: [{ text: "确认迎战", actionTag: "CONFIRMED_STATIC_BATTLE_FINAL" }]
+    speaker: (playerProfile: PlayerProfile) => playerProfile.name || '你',
+    text: (playerProfile: PlayerProfile, playerTeam: Pokemon[]) =>
+      '战斗即将开始！',
+    choices: [{ text: '确认迎战', actionTag: 'CONFIRMED_STATIC_BATTLE_FINAL' }],
   },
 };
 
 // Represents the "Struggle" move used when a Pokémon has no PP left.
 export const STRUGGLE_MOVE: PokemonMoveInstance = {
-  name: "挣扎",
+  name: '挣扎',
   power: 50,
   type: PokemonType.NORMAL,
   category: '物理',
   basePP: 1,
   currentPP: 1,
-  description: "当所有招式都无法使用时，使用者进行拼命的攻击。也会对自身造成伤害。",
-  effects: [{
-    type: 'RECOIL_FIXED',
-    target: 'SELF',
-    recoilFixedPercentMaxHp: 0.25,
-    effectString: "自身承受最大HP的1/4反作用力伤害"
-  }],
+  description:
+    '当所有招式都无法使用时，使用者进行拼命的攻击。也会对自身造成伤害。',
+  effects: [
+    {
+      type: 'RECOIL_FIXED',
+      target: 'SELF',
+      recoilFixedPercentMaxHp: 0.25,
+      effectString: '自身承受最大HP的1/4反作用力伤害',
+    },
+  ],
   accuracy: null,
   priority: 0,
 };
