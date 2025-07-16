@@ -5,16 +5,13 @@ import {
   StatusCondition,
   Stat,
   ActiveStatusCondition,
-  MoveEffect,
   StatStageModifier,
   InventoryItem,
-  ItemEffectType,
 } from '../types';
 import {
   TYPE_EFFECTIVENESS,
   STAT_STAGE_MULTIPLIERS,
   STRUGGLE_MOVE,
-  DEFAULT_POKEMON_CATCH_RATE,
   DEFAULT_POKEBALL_BONUS,
   STATUS_CONDITION_INFO,
 } from '../constants';
@@ -691,7 +688,7 @@ export interface ItemApplicationResult {
 export const applyItemEffects = (
   item: InventoryItem,
   targetPokemon: Pokemon,
-  userPokemon?: Pokemon // Only relevant for items that might affect the user, like X Attack
+  _userPokemon?: Pokemon // Only relevant for items that might affect the user, like X Attack
 ): ItemApplicationResult => {
   const result: ItemApplicationResult = { success: false, messages: [] };
   if (!item.effect) {
@@ -756,7 +753,7 @@ export const applyItemEffects = (
       }
       break;
 
-    case 'CATCH_POKEMON':
+    case 'CATCH_POKEMON': {
       if (targetPokemon.isPlayerOwned) {
         result.messages.push(`不能对自己的宝可梦使用精灵球！`);
         return result;
@@ -788,6 +785,7 @@ export const applyItemEffects = (
         result.success = true; // Item was used successfully, even if catch failed
       }
       break;
+    }
 
     // STAT_BOOST_TEMP not fully implemented in ItemEffect type yet, but can be added.
     // case 'STAT_BOOST_TEMP':

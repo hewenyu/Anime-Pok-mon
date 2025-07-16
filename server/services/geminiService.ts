@@ -3,7 +3,6 @@ import {
   GameState,
   AIStoryResponse,
   ChatHistoryEntry,
-  NPC,
   AIStoryChoice,
   AIEventTrigger,
   PlayerProfile,
@@ -15,9 +14,8 @@ import {
   BattleCommandParseContext,
   PokemonType,
   ClassifiedIntent,
-  CustomizationIntentType,
   ActiveStatusCondition,
-} from '../types'; // Added ClassifiedIntent, CustomizationIntentType, ActiveStatusCondition
+} from '../types';
 import {
   GEMINI_GAME_MASTER_SYSTEM_PROMPT,
   GEMINI_MOVE_DESCRIPTION_SYSTEM_PROMPT,
@@ -561,12 +559,11 @@ export async function fetchStoryContinuation(
 
         if (playerActionTagOrInputOrSpecializedPrompt.endsWith('_OPEN_CHAT')) {
           if (
-            aiResponse.narrative &&
-            aiResponse.narrative.trim() !== '' &&
-            aiResponse.narrative !== '...' &&
-            !aiResponse.narrative.toLowerCase().includes(npcName.toLowerCase())
+            !aiResponse.narrative ||
+            aiResponse.narrative.trim() === '' ||
+            aiResponse.narrative === '...' ||
+            aiResponse.narrative.toLowerCase().includes(npcName.toLowerCase())
           ) {
-          } else {
             aiResponse.narrative = '';
           }
           if (
@@ -598,10 +595,9 @@ export async function fetchStoryContinuation(
           }
         } else if (
           !aiResponse.narrative &&
-          aiResponse.suggestedPlayerReplies &&
-          aiResponse.suggestedPlayerReplies.length > 0
+          (!aiResponse.suggestedPlayerReplies ||
+            aiResponse.suggestedPlayerReplies.length === 0)
         ) {
-        } else {
           aiResponse.narrative = `(${aiResponse.speaker || npcName} 似乎无话可说。)`;
           aiResponse.suggestedPlayerReplies = [
             {
