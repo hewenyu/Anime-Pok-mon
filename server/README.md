@@ -22,6 +22,7 @@ This contains everything you need to run your app locally.
 - **GEMINI_MODEL**: Optional. Specifies which Gemini model to use (default: 'gemini-2.5-flash').
 
 Example `.env.local`:
+
 ```
 API_KEY=your_gemini_api_key_here
 GOOGLE_GEMINI_BASE_URL=https://your-gemini-endpoint.com

@@ -1,0 +1,42 @@
+name: Lint and Code Quality Check
+
+on:
+  pull_request:
+    branches: [ main ]
+    paths:
+      - 'server/**'
+  push:
+    branches: [ main ]
+    paths:
+      - 'server/**'
+
+jobs:
+  lint-and-check:
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+      
+    - name: Setup Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: '18'
+        cache: 'npm'
+        cache-dependency-path: 'server/package-lock.json'
+        
+    - name: Install dependencies
+      working-directory: ./server
+      run: npm ci
+      
+    - name: Run ESLint
+      working-directory: ./server
+      run: npm run lint
+      
+    - name: Check Prettier formatting
+      working-directory: ./server
+      run: npm run format:check
+      
+    - name: Build project (ensure code compiles)
+      working-directory: ./server
+      run: npm run build
