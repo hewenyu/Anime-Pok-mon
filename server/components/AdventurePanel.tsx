@@ -22,6 +22,7 @@ interface AdventurePanelProps {
   aiLoadingStatus: LoadingStatus;
   onToggleHistoryModal: () => void;
   onToggleNPCListModal: () => void;
+  onToggleBattleHistoryModal?: () => void; // Added for battle history
 }
 
 const AdventurePanel: React.FC<AdventurePanelProps> = ({
@@ -36,6 +37,7 @@ const AdventurePanel: React.FC<AdventurePanelProps> = ({
   aiLoadingStatus,
   onToggleHistoryModal,
   onToggleNPCListModal,
+  onToggleBattleHistoryModal, // Added
 }) => {
   const [customInputText, setCustomInputText] = useState('');
   const [persistentImageUrl, setPersistentImageUrl] = useState<
@@ -258,6 +260,17 @@ const AdventurePanel: React.FC<AdventurePanelProps> = ({
               >
                 交流
               </button>
+              {onToggleBattleHistoryModal && (
+                <button
+                  type="button"
+                  onClick={onToggleBattleHistoryModal}
+                  className="choice-button px-4 py-2.5"
+                  disabled={isLoading}
+                  aria-label="查看战斗记录"
+                >
+                  战斗记录
+                </button>
+              )}
             </div>
           </div>
         </form>

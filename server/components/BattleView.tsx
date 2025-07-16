@@ -49,7 +49,8 @@ interface BattleViewProps {
     finalInventory: InventoryItem[],
     finalEnemyPokemon: Pokemon,
     usedRun: boolean,
-    caughtPokemon?: Pokemon // Added from types.ts for explicit catch handling
+    caughtPokemon?: Pokemon, // Added from types.ts for explicit catch handling
+    battleLog?: BattleChatMessage[] // Added to preserve battle history
   ) => void;
   playerProfileName: string | undefined;
   onRegeneratePokemonImage: (instanceId: string) => void;
@@ -1182,7 +1183,8 @@ const BattleView: React.FC<BattleViewProps> = ({
                   currentInventory,
                   enemyPokemon,
                   battleOutcome === 'run',
-                  pokemonWasCaught || undefined
+                  pokemonWasCaught || undefined,
+                  battleLog // Pass the battle log for persistence
                 );
               }
             }}

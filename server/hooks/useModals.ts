@@ -15,6 +15,7 @@ export const useModals = () => {
   const [showPlayerProfileEditModal, setShowPlayerProfileEditModal] =
     useState(false);
   const [showInventoryModal, setShowInventoryModal] = useState(false);
+  const [showBattleHistoryModal, setShowBattleHistoryModal] = useState(false); // Added
   // Fix: Changed type of pokemonToViewInModal from NPC | null to Pokemon | null
   const [pokemonToViewInModal, setPokemonToViewInModal] =
     useState<Pokemon | null>(null);
@@ -37,6 +38,10 @@ export const useModals = () => {
   );
   const toggleInventoryModal = useCallback(
     () => setShowInventoryModal(prev => !prev),
+    []
+  );
+  const toggleBattleHistoryModal = useCallback(
+    () => setShowBattleHistoryModal(prev => !prev),
     []
   );
 
@@ -71,6 +76,8 @@ export const useModals = () => {
     togglePlayerProfileEditModal,
     showInventoryModal,
     toggleInventoryModal,
+    showBattleHistoryModal, // Added
+    toggleBattleHistoryModal, // Added
     pokemonToViewInModal,
     openPokemonDetailModal,
     closePokemonDetailModal,

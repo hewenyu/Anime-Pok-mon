@@ -328,6 +328,7 @@ export const INITIAL_GAME_STATE: GameState = {
   pendingBattleDetails: undefined,
   chatHistory: [],
   knownNPCs: [],
+  battleHistory: [], // Battle records for persistence
   initialProfileGenerated: false,
   customizationAssistantResponse: null,
   assistantChatJustRefreshed: false,

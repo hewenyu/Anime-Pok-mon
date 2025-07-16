@@ -406,6 +406,9 @@ export interface GameState {
 
   chatHistory: ChatHistoryEntry[]; // Main game/event log.
   knownNPCs: NPC[];
+  
+  // Battle history tracking
+  battleHistory: BattleRecord[]; // Detailed battle records
 
   initialProfileGenerated: boolean;
   // Store for the AI's suggested start time from profile generation (Unix ms timestamp)
@@ -474,6 +477,18 @@ export type BattleChatMessageType =
   | 'system_message'
   | 'ai_feedback'
   | 'ai_item_action_suggestion';
+export interface BattleRecord {
+  id: string;
+  timestamp: number;
+  playerPokemon: string; // Pokemon name
+  enemyPokemon: string; // Pokemon name
+  location: string;
+  outcome: 'win' | 'loss' | 'run' | 'catch';
+  battleLog: BattleChatMessage[]; // Detailed battle transcript
+  caughtPokemon?: string; // Name of caught Pokemon if applicable
+  duration?: number; // Battle duration in milliseconds
+}
+
 export interface BattleChatMessage {
   id: string;
   speaker: string;

@@ -19,6 +19,7 @@ import PlayerProfileEditModal from './PlayerProfileEditModal.tsx';
 import InventoryModal from './InventoryModal.tsx';
 import PokemonDetailModal from './PokemonDetailModal.tsx';
 import ContinueGameModal from './ContinueGameModal.tsx';
+import BattleHistoryModal from './BattleHistoryModal.tsx';
 
 const App: React.FC = () => {
   // State for continue game modal
@@ -69,6 +70,8 @@ const App: React.FC = () => {
     togglePlayerProfileEditModal,
     showInventoryModal,
     toggleInventoryModal,
+    showBattleHistoryModal,
+    toggleBattleHistoryModal,
     pokemonToViewInModal,
     openPokemonDetailModal,
     closePokemonDetailModal,
@@ -244,6 +247,7 @@ const App: React.FC = () => {
             onEditPlayerProfile={togglePlayerProfileEditModal}
             onRegeneratePokemonImage={handleRegeneratePokemonImage}
             onOpenPokemonDetailModal={openPokemonDetailModal} // Pass the function
+            onToggleBattleHistoryModal={toggleBattleHistoryModal} // Added
           />
         );
         break;
@@ -370,6 +374,13 @@ const App: React.FC = () => {
           isOpen={showInventoryModal}
           onClose={toggleInventoryModal}
           inventory={gameState.inventory}
+        />
+      )}
+      {showBattleHistoryModal && (
+        <BattleHistoryModal
+          isOpen={showBattleHistoryModal}
+          onClose={toggleBattleHistoryModal}
+          battleHistory={gameState.battleHistory || []}
         />
       )}
       {pokemonToViewInModal && (

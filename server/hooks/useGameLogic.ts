@@ -17,6 +17,8 @@ import {
   FullProfileSuggestionData,
   UserDateTimeInput,
   ProfileDataForTimeSuggestion,
+  BattleRecord,
+  BattleChatMessage,
 } from '../types';
 import {
   INITIAL_GAME_STATE,
@@ -1073,7 +1075,8 @@ export const useGameLogic = () => {
       finalInventory: InventoryItem[],
       finalEnemyPokemonState: Pokemon, // Renamed for clarity
       usedRun: boolean,
-      caughtPokemon?: Pokemon // New parameter for the caught Pokémon
+      caughtPokemon?: Pokemon, // New parameter for the caught Pokémon
+      battleLog?: BattleChatMessage[] // Battle history for persistence
     ) => {
       let resultSegmentId: string;
       const tempNewChatHistory: ChatHistoryEntry[] = [];
@@ -1200,6 +1203,29 @@ export const useGameLogic = () => {
           gameState.battleReturnSegmentLose || 'BATTLE_LOST_DEFAULT';
       }
 
+      // Create battle record for history
+      const battleRecord: BattleRecord = {
+        id: `battle-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
+        timestamp: Date.now(),
+        playerPokemon:
+          finalPlayerTeamFromBattle.find(p => !p.isFainted)?.name || '未知',
+        enemyPokemon: finalEnemyPokemonState.name,
+        location: gameState.currentLocationDescription,
+        outcome: caughtPokemon
+          ? 'catch'
+          : usedRun
+            ? 'run'
+            : didPlayerWin
+              ? 'win'
+              : 'loss',
+        battleLog: battleLog || [],
+        caughtPokemon: caughtPokemon?.name,
+        duration:
+          battleLog && battleLog.length > 0
+            ? battleLog[battleLog.length - 1].timestamp - battleLog[0].timestamp
+            : undefined,
+      };
+
       updateGameState(
         prev => ({
           ...prev,
@@ -1212,6 +1238,7 @@ export const useGameLogic = () => {
           aiLoadingStatus: { status: 'idle' } as LoadingStatus,
           customizationAssistantResponse: null,
           chatHistory: [...prev.chatHistory, ...tempNewChatHistory],
+          battleHistory: [...(prev.battleHistory || []), battleRecord], // Add battle record
         }),
         {
           minutes:
@@ -2118,7 +2145,10 @@ export const useGameLogic = () => {
   // Auto-save game state to localStorage when it changes
   useEffect(() => {
     // Only save if the game has progressed beyond initial customization
-    if (gameState.gameMode !== GameMode.CUSTOMIZE_RANDOM_START || gameState.initialProfileGenerated) {
+    if (
+      gameState.gameMode !== GameMode.CUSTOMIZE_RANDOM_START ||
+      gameState.initialProfileGenerated
+    ) {
       saveGameState(gameState);
     }
   }, [gameState]);

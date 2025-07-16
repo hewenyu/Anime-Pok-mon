@@ -19,7 +19,7 @@ export const saveGameState = (gameState: GameState): boolean => {
       timestamp: Date.now(),
       gameState: gameState,
     };
-    
+
     localStorage.setItem(GAME_STATE_KEY, JSON.stringify(dataToStore));
     return true;
   } catch (error) {
@@ -39,7 +39,7 @@ export const loadGameState = (): GameState | null => {
     }
 
     const parsed: StoredGameData = JSON.parse(storedData);
-    
+
     // 检查版本兼容性
     if (parsed.version !== GAME_STATE_VERSION) {
       console.warn('Game state version mismatch, ignoring saved data');
