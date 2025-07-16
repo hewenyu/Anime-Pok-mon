@@ -1872,11 +1872,18 @@ export const useGameLogic = () => {
   );
 
   useEffect(() => {
+    // Only auto-generate if:
+    // 1. We're in customize mode
+    // 2. No initial profile has been generated
+    // 3. AI is not currently loading
+    // 4. We're not loading from a saved state
+    // 5. There's no existing current AI scene (to avoid overriding loaded content)
     if (
       gameState.gameMode === GameMode.CUSTOMIZE_RANDOM_START &&
       !gameState.initialProfileGenerated &&
       gameState.aiLoadingStatus.status === 'idle' &&
-      !isLoadingFromSave // Don't auto-generate if we're loading from saved state
+      !isLoadingFromSave &&
+      !gameState.currentAIScene // Additional check to prevent overriding loaded content
     ) {
       triggerAIStory('GENERATE_FULL_RANDOM_PROFILE', true);
     }
@@ -1884,6 +1891,7 @@ export const useGameLogic = () => {
     gameState.gameMode,
     gameState.initialProfileGenerated,
     gameState.aiLoadingStatus.status,
+    gameState.currentAIScene, // Added dependency
     isLoadingFromSave,
     triggerAIStory,
   ]);
@@ -2161,19 +2169,25 @@ export const useGameLogic = () => {
     const savedState = loadGameState();
     if (savedState) {
       setIsLoadingFromSave(true); // Set flag to prevent auto-generation
-      setGameState(savedState);
-      // Set appropriate static segment based on loaded state
-      if (savedState.gameMode === GameMode.ADVENTURE) {
-        setCurrentStaticSegmentId('AI_ADVENTURE_HANDOFF');
-      } else if (savedState.gameMode === GameMode.BATTLE) {
-        setCurrentStaticSegmentId('BATTLE_MODE');
-      } else if (savedState.initialProfileGenerated) {
-        setCurrentStaticSegmentId('CUSTOMIZED_START_READY');
-      }
-      // Clear the flag after a short delay to allow state to stabilize
+      
+      // Update state in a single batch to prevent race conditions
+      setGameState(prevState => {
+        // Set appropriate static segment based on loaded state
+        if (savedState.gameMode === GameMode.ADVENTURE) {
+          setCurrentStaticSegmentId('AI_ADVENTURE_HANDOFF');
+        } else if (savedState.gameMode === GameMode.BATTLE) {
+          setCurrentStaticSegmentId('BATTLE_MODE');
+        } else if (savedState.initialProfileGenerated) {
+          setCurrentStaticSegmentId('CUSTOMIZED_START_READY');
+        }
+        
+        return savedState;
+      });
+      
+      // Clear the flag after state has stabilized
       setTimeout(() => {
         setIsLoadingFromSave(false);
-      }, 100);
+      }, 200); // Increased delay to ensure stability
     }
   }, []);
 
