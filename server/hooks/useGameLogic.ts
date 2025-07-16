@@ -3,9 +3,7 @@ import {
   GameState,
   GameMode,
   PlayerProfile,
-  StorySegment,
   Pokemon,
-  AIStoryResponse,
   AIEventTrigger,
   InventoryItem,
   AIStoryChoice,
@@ -16,7 +14,6 @@ import {
   AICustomizationScreenActionTag,
   LoadingStatus,
   ClassifiedIntent,
-  CustomizationIntentType,
   FullProfileSuggestionData,
   UserDateTimeInput,
   ProfileDataForTimeSuggestion,
@@ -1356,7 +1353,7 @@ export const useGameLogic = () => {
               p => p.instanceId !== (value as string)
             );
             break;
-          case 'itemAdd':
+          case 'itemAdd': {
             const itemToAdd = sanitizeItemData(value as InventoryItem);
             const existingItemIndex = newInventory.findIndex(
               i => i.name === itemToAdd.name
@@ -1365,10 +1362,12 @@ export const useGameLogic = () => {
               newInventory[existingItemIndex].quantity += itemToAdd.quantity;
             else newInventory.push(itemToAdd);
             break;
-          case 'itemRemove':
+          }
+          case 'itemRemove': {
             newInventory = newInventory.filter(i => i.id !== (value as string));
             break;
-          case 'itemQtyUpdate':
+          }
+          case 'itemQtyUpdate': {
             const { itemId, quantity } = value as {
               itemId: string;
               quantity: number;
@@ -1382,7 +1381,8 @@ export const useGameLogic = () => {
               else newInventory.splice(itemIdxToUpdate, 1);
             }
             break;
-          case 'profileFieldUpdate':
+          }
+          case 'profileFieldUpdate': {
             const { field: profileFieldName, value: profileFieldValue } =
               value as {
                 field:
@@ -1429,7 +1429,8 @@ export const useGameLogic = () => {
                 newCurrentGameTime = newAiSuggestedStartTime; // Also update current game time if full profile is accepted
             }
             break;
-          case 'gameTimeUpdate':
+          }
+          case 'gameTimeUpdate': {
             const timeInput = value as UserDateTimeInput;
             newCurrentGameTime = userDateTimeToTimestamp(timeInput);
             // When time is updated in customize screen, it affects the aiSuggestedGameStartTime IF it's from AI
@@ -1438,6 +1439,7 @@ export const useGameLogic = () => {
             // Let's also update aiSuggestedGameStartTime here so the UI can reflect an AI-driven change or a dynamic suggestion.
             newAiSuggestedStartTime = newCurrentGameTime;
             break;
+          }
         }
         newState.playerTeam = newPlayerTeam;
         newState.inventory = newInventory;
@@ -1472,12 +1474,11 @@ export const useGameLogic = () => {
       let classifiedIntent: ClassifiedIntent | null = null;
       let specializedSystemPrompt: string =
         GEMINI_GENERAL_CUSTOMIZATION_CHAT_SYSTEM_PROMPT;
-      let specializedUserContentPrompt: string = messageText;
 
       const handleRetry: OnRetryCallback = (
         attempt,
         maxAttempts,
-        errorType
+        _errorType
       ) => {
         updateGameState(prev => ({
           ...prev,
@@ -1526,7 +1527,6 @@ export const useGameLogic = () => {
       let contextForSpecializedAgent = '';
 
       if (classifiedIntent) {
-        specializedUserContentPrompt = classifiedIntent.originalQuery;
         switch (classifiedIntent.intent) {
           case 'CREATE_FULL_PROFILE':
             specializedSystemPrompt = GEMINI_FULL_PROFILE_CREATOR_SYSTEM_PROMPT;
@@ -1561,7 +1561,7 @@ export const useGameLogic = () => {
                 `玩家要求基于以下主题或描述创建一个完整的角色档案：“${classifiedIntent.params?.theme || classifiedIntent.originalQuery}”。请严格遵循 \`GEMINI_FULL_PROFILE_CREATOR_SYSTEM_PROMPT\` 的指示生成JSON响应，包括一个合适的 \`suggestedGameStartTime\` (Unix 毫秒时间戳)。`;
             }
             break;
-          case 'SUGGEST_POKEMON':
+          case 'SUGGEST_POKEMON': {
             specializedSystemPrompt =
               GEMINI_STARTER_POKEMON_SUGGESTOR_SYSTEM_PROMPT;
             let pokemonQuery = `玩家想要一个初始宝可梦建议。原始请求：“${classifiedIntent.originalQuery}”。`;
@@ -1572,7 +1572,8 @@ export const useGameLogic = () => {
             pokemonQuery += ` 请严格遵循 \`GEMINI_STARTER_POKEMON_SUGGESTOR_SYSTEM_PROMPT\` 的指示生成JSON响应。`;
             contextForSpecializedAgent = pokemonQuery;
             break;
-          case 'SUGGEST_ITEM':
+          }
+          case 'SUGGEST_ITEM': {
             specializedSystemPrompt =
               GEMINI_STARTER_ITEM_SUGGESTOR_SYSTEM_PROMPT;
             let itemQuery = `玩家想要一个初始道具建议。原始请求：“${classifiedIntent.originalQuery}”。`;
@@ -1583,6 +1584,7 @@ export const useGameLogic = () => {
             itemQuery += ` 请严格遵循 \`GEMINI_STARTER_ITEM_SUGGESTOR_SYSTEM_PROMPT\` 的指示生成JSON响应。`;
             contextForSpecializedAgent = itemQuery;
             break;
+          }
           case 'MODIFY_PROFILE_FIELD':
             specializedSystemPrompt =
               GEMINI_PROFILE_FIELD_ADVISOR_SYSTEM_PROMPT;
@@ -1619,7 +1621,7 @@ export const useGameLogic = () => {
             break;
           case 'GENERAL_CHAT_OR_CLARIFICATION':
           case 'UNKNOWN_INTENT':
-          default:
+          default: {
             specializedSystemPrompt =
               GEMINI_GENERAL_CUSTOMIZATION_CHAT_SYSTEM_PROMPT;
             let generalQuery = `玩家的意图是“${classifiedIntent.intent}”。原始请求：“${classifiedIntent.originalQuery}”。`;
@@ -1628,6 +1630,7 @@ export const useGameLogic = () => {
             generalQuery += ` 请进行通用对话或澄清，严格遵循 \`GEMINI_GENERAL_CUSTOMIZATION_CHAT_SYSTEM_PROMPT\` 的指示生成JSON响应。`;
             contextForSpecializedAgent = generalQuery;
             break;
+          }
         }
 
         if (
@@ -1711,7 +1714,7 @@ export const useGameLogic = () => {
       const handleRetry: OnRetryCallback = (
         attempt,
         maxAttempts,
-        errorType
+        _errorType
       ) => {
         updateGameState(prev => ({
           ...prev,
@@ -1824,8 +1827,8 @@ export const useGameLogic = () => {
   const fetchInitialNPCDialogueAndOrSuggestions = useCallback(
     async (
       npcToChatWith: NPC,
-      setSelectedNPCForChat: Function,
-      setNpcChatSuggestions: Function
+      setSelectedNPCForChat: (npc: NPC | null) => void,
+      setNpcChatSuggestions: (suggestions: AIStoryChoice[]) => void
     ) => {
       setNpcInteractionLoading(true);
       updateGameState(prev => ({
@@ -1927,8 +1930,8 @@ export const useGameLogic = () => {
       npcId: string,
       messageText: string,
       currentNpcContext: NPC,
-      setSelectedNPCForChat: Function,
-      setNpcChatSuggestions: Function,
+      setSelectedNPCForChat: (npc: NPC | null) => void,
+      setNpcChatSuggestions: (suggestions: AIStoryChoice[]) => void,
       suggestionActionTag?: string
     ) => {
       setNpcInteractionLoading(true);

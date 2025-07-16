@@ -1,6 +1,6 @@
 import React from 'react';
 // Fix: Added missing import for StorySegment and Pokemon
-import { GameMode, NPC, StorySegment, Pokemon } from '../types'; // Corrected path
+import { GameMode, NPC, StorySegment } from '../types'; // Corrected path
 import { useGameLogic } from '../hooks/useGameLogic'; // Corrected path
 import { useModals } from '../hooks/useModals'; // Corrected path
 import { sanitizePokemonData, sanitizeItemData } from '../utils/dataSanitizers'; // Corrected path
@@ -24,7 +24,6 @@ const App: React.FC = () => {
     gameState,
     // updateGameState, // Direct updateGameState is less used, actions are preferred
     currentStaticSegmentId, // Keep if AdventureView still needs it directly for rendering static content
-    advanceStaticStory,
     handleStaticStoryChoice,
     triggerAIStory, // Main AI trigger
     handleAIChoice,
@@ -148,7 +147,7 @@ const App: React.FC = () => {
           />
         );
 
-      case GameMode.ADVENTURE:
+      case GameMode.ADVENTURE: {
         // Determine what content to display in AdventurePanel
         let displayAIContent = !!gameState.currentAIScene;
         let effectiveStaticContent: StorySegment | null = null;
@@ -217,8 +216,10 @@ const App: React.FC = () => {
             onOpenPokemonDetailModal={openPokemonDetailModal} // Pass the function
           />
         );
+        break;
+      }
 
-      case GameMode.BATTLE:
+      case GameMode.BATTLE: {
         const firstPlayerPokemonForBattle = gameState.playerTeam.find(
           p =>
             p.instanceId === gameState.currentBattlePlayerPokemonId &&
@@ -265,6 +266,7 @@ const App: React.FC = () => {
             onRegeneratePokemonImage={handleRegeneratePokemonImage}
           />
         );
+      }
       default:
         return (
           <div className="flex items-center justify-center h-screen text-xl">

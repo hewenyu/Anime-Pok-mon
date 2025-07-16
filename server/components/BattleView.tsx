@@ -2,14 +2,10 @@ import React, { useState, useEffect, useCallback, useRef } from 'react';
 import {
   Pokemon,
   InventoryItem,
-  PokemonType,
   BattleChatMessage,
   BattleChatMessageType,
   ParsedBattleAction,
   BattleCommandParseContext,
-  PokemonMoveInstance,
-  ActiveStatusCondition,
-  StatStageModifier,
   StatusCondition,
   PokemonMoveInstance as Move,
   LoadingStatus,
@@ -23,13 +19,9 @@ import {
   checkCanPokemonMove,
   applyMoveEffects,
   processEndOfTurnStatus,
-  PreMoveCheckResult,
-  AppliedEffectsResult,
-  EndOfTurnResult,
   applyItemEffects,
-  ItemApplicationResult,
 } from '../services/battleService';
-import { STRUGGLE_MOVE, STATUS_CONDITION_INFO } from '../constants';
+import { STATUS_CONDITION_INFO } from '../constants';
 import {
   parsePlayerBattleCommand,
   OnRetryCallback,
@@ -97,7 +89,7 @@ const BattleView: React.FC<BattleViewProps> = ({
   );
   const [currentScreen, setCurrentScreen] = useState<BattleScreen>('MAIN_MENU');
   const [battleLog, setBattleLog] = useState<BattleChatMessage[]>([]);
-  const [selectedMove, setSelectedMove] = useState<Move | null>(null);
+  const [, setSelectedMove] = useState<Move | null>(null);
 
   const [commandParseLoadingStatus, setCommandParseLoadingStatus] =
     useState<LoadingStatus>({ status: 'idle' });
@@ -1050,7 +1042,7 @@ const BattleView: React.FC<BattleViewProps> = ({
     }
 
     switch (parsedAction.actionType) {
-      case 'USE_MOVE':
+      case 'USE_MOVE': {
         const moveInstance = activePlayerPokemon.moves.find(
           m => m.name === parsedAction.moveName
         );
@@ -1068,6 +1060,7 @@ const BattleView: React.FC<BattleViewProps> = ({
           );
         }
         break;
+      }
       case 'SWITCH_POKEMON':
         if (parsedAction.targetPokemonInstanceId) {
           handleSwitchPokemon(parsedAction.targetPokemonInstanceId);
@@ -1078,7 +1071,7 @@ const BattleView: React.FC<BattleViewProps> = ({
       case 'RUN':
         handleRunAction();
         break;
-      case 'USE_ITEM':
+      case 'USE_ITEM': {
         const itemFromInventory = currentInventory.find(
           i =>
             i.name === (parsedAction.selectedItemName || parsedAction.itemName)
@@ -1111,6 +1104,7 @@ const BattleView: React.FC<BattleViewProps> = ({
           );
         }
         break;
+      }
       case 'UNKNOWN':
       case 'AMBIGUOUS':
       case 'INVALID_TARGET':

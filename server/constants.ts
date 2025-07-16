@@ -6,18 +6,9 @@ import {
   GameMode,
   StorySegment,
   PlayerProfile,
-  IVs,
-  NPC,
-  AIStoryChoice,
   PokemonMoveInstance,
   StatusCondition,
-  Stat,
-  MoveEffect,
-  MoveEffectType,
-  CustomizationIntentType,
-  ClassifiedIntent,
-  ProfileDataForTimeSuggestion,
-} from './types'; // Added CustomizationIntentType, ClassifiedIntent, ProfileDataForTimeSuggestion
+} from './types';
 
 // Record mapping PokemonType to Tailwind CSS classes for styling type badges.
 export const TYPE_COLORS: Record<PokemonType, string> = {
@@ -1161,7 +1152,7 @@ export const STORY_DATA: Record<string, StorySegment> = {
   CONFIRM_STATIC_BATTLE_SEGMENT: {
     id: 'CONFIRM_STATIC_BATTLE_SEGMENT',
     speaker: (playerProfile: PlayerProfile) => playerProfile.name || '你',
-    text: (playerProfile: PlayerProfile, playerTeam: Pokemon[]) =>
+    text: (_playerProfile: PlayerProfile, _playerTeam: Pokemon[]) =>
       '战斗即将开始！',
     choices: [{ text: '确认迎战', actionTag: 'CONFIRMED_STATIC_BATTLE_FINAL' }],
   },

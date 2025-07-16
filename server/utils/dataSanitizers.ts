@@ -7,7 +7,6 @@ import {
   NPC,
   InventoryItem,
   ItemEffect,
-  ItemEffectType,
   StatusCondition,
 } from '../types';
 

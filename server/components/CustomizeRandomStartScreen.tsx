@@ -9,16 +9,12 @@ import {
   AIStoryResponse,
   AIStoryChoice,
   AIEventTrigger,
-  PokemonType,
-  AICustomizationScreenActionTag,
-  PokemonMoveInstance,
   LoadingStatus,
   FullProfileSuggestionData,
   UserDateTimeInput,
   ProfileDataForTimeSuggestion,
 } from '../types';
 import PokemonCard from './PokemonCard';
-import TypeBadge from './TypeBadge';
 import PokemonDetailModal from './PokemonDetailModal';
 
 interface CustomizeRandomStartScreenProps {
@@ -1636,11 +1632,13 @@ const CustomizeRandomStartScreen: React.FC<CustomizeRandomStartScreenProps> = ({
                         role="button"
                         tabIndex={0}
                         onKeyDown={e => {
-                          if (e.key === 'Enter' || e.key === ' ')
-                            entry.isClickableSuggestion &&
+                          if (e.key === 'Enter' || e.key === ' ') {
+                            if (entry.isClickableSuggestion) {
                               setPokemonToViewInModal(
                                 entry.suggestedPokemonForConfirmation!
                               );
+                            }
+                          }
                         }}
                         aria-label={`查看 ${entry.suggestedPokemonForConfirmation.name} 详情`}
                       >

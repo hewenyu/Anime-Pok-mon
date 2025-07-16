@@ -1,13 +1,5 @@
 import React, { useState, useEffect, useCallback } from 'react';
-import {
-  Pokemon,
-  PokemonType,
-  PokemonMoveInstance,
-  ActiveStatusCondition,
-  Stat,
-  StatStageModifier,
-  StatusCondition,
-} from '../types';
+import { Pokemon, PokemonMoveInstance, StatusCondition } from '../types';
 import TypeBadge from './TypeBadge';
 import { STATUS_CONDITION_INFO, STAT_STAGE_MULTIPLIERS } from '../constants';
 import { fetchMoveDescription } from '../services/geminiService'; // Import the new service
@@ -88,14 +80,6 @@ const PokemonDetailModal: React.FC<PokemonDetailModalProps> = ({
     }
   }, [pokemon?.instanceId, isOpen, expandedMoveName, pokemon?.moves]);
 
-  if (!isOpen || !pokemon) {
-    return null;
-  }
-
-  const handleImageError = () => {
-    setImageLoadError(true);
-  };
-
   const fetchAndCacheMoveDescription = useCallback(
     async (moveName: string, pokemonNameForContext: string) => {
       setMoveDescriptionCache(prev => ({
@@ -121,6 +105,14 @@ const PokemonDetailModal: React.FC<PokemonDetailModalProps> = ({
     },
     []
   );
+
+  if (!isOpen || !pokemon) {
+    return null;
+  }
+
+  const handleImageError = () => {
+    setImageLoadError(true);
+  };
 
   const toggleMoveExpansion = (moveName: string) => {
     const newExpandedMove = expandedMoveName === moveName ? null : moveName;

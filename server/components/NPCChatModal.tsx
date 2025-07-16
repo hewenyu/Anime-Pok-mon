@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { NPC, ChatHistoryEntry, AIStoryChoice } from '../types';
+import { NPC, AIStoryChoice } from '../types';
 
 interface NPCChatModalProps {
   npc: NPC | null;

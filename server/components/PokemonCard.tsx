@@ -1,10 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import {
-  Pokemon,
-  PokemonType,
-  ActiveStatusCondition,
-  PokemonMoveInstance,
-} from '../types';
+import { Pokemon, PokemonType, ActiveStatusCondition } from '../types';
 import TypeBadge from './TypeBadge';
 import { STATUS_CONDITION_INFO } from '../constants'; // For status display
 
@@ -28,7 +23,7 @@ const ResourceBar: React.FC<{
   colorClass,
   label,
   barHeight = 'h-2 md:h-2.5',
-  textClass = 'text-gray-700',
+  _textClass = 'text-gray-700',
 }) => {
   const percentage = max > 0 ? Math.max(0, (current / max) * 100) : 0;
   return (

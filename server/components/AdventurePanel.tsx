@@ -47,7 +47,7 @@ const AdventurePanel: React.FC<AdventurePanelProps> = ({
     let newImageSource: string | undefined | null = null;
 
     if (currentAIContent) {
-      if (currentAIContent.hasOwnProperty('imageUrl')) {
+      if (Object.prototype.hasOwnProperty.call(currentAIContent, 'imageUrl')) {
         newImageSource = currentAIContent.imageUrl;
       }
     } else if (currentStaticContent) {
