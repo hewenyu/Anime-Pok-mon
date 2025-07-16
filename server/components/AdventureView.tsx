@@ -1,6 +1,16 @@
-
 import React from 'react';
-import { GameState, PlayerProfile, Pokemon, InventoryItem, StorySegment, AIStoryResponse, StoryChoice, AIStoryChoice, GameMode, LoadingStatus } from '../types';
+import {
+  GameState,
+  PlayerProfile,
+  Pokemon,
+  InventoryItem,
+  StorySegment,
+  AIStoryResponse,
+  StoryChoice,
+  AIStoryChoice,
+  GameMode,
+  LoadingStatus,
+} from '../types';
 import AdventurePanel from './AdventurePanel';
 import PlayerInfoPanel from './PlayerInfoPanel';
 import TeamAndInventoryPanel from './TeamAndInventoryPanel';
@@ -30,7 +40,7 @@ interface AdventureViewProps {
   onOpenPokemonDetailModal: (pokemon: Pokemon) => void; // Added prop
 }
 
-const AdventureView: React.FC<AdventureViewProps> = (props) => {
+const AdventureView: React.FC<AdventureViewProps> = props => {
   if (props.gameState.gameMode !== GameMode.ADVENTURE) {
     return null;
   }
@@ -67,12 +77,12 @@ const AdventureView: React.FC<AdventureViewProps> = (props) => {
           onToggleNPCListModal={props.onToggleNPCListModal}
         />
       </main>
-      
+
       {/* Right Sidebar: Team and Inventory Button */}
       <aside className="sidebar-container w-full md:w-64 lg:w-80 flex-shrink-0 order-3 md:order-3 p-2 md:p-3 lg:p-4 h-auto md:h-screen md:max-h-screen flex flex-col">
         <TeamAndInventoryPanel
           playerTeam={props.playerTeam}
-          onOpenInventoryModal={props.onToggleInventoryModal} 
+          onOpenInventoryModal={props.onToggleInventoryModal}
           onRegeneratePokemonImage={props.onRegeneratePokemonImage}
           onOpenPokemonDetailModal={props.onOpenPokemonDetailModal} // Pass prop
         />
