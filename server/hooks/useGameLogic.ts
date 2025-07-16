@@ -97,6 +97,7 @@ export const useGameLogic = () => {
   const [currentStaticSegmentId, setCurrentStaticSegmentId] = useState<string>(
     'INITIAL_PROFILE_PREPARATION'
   );
+  const [isLoadingFromSave, setIsLoadingFromSave] = useState<boolean>(false);
 
   const advanceGameTimeInternal = (
     currentTs: number,
@@ -1547,7 +1548,7 @@ export const useGameLogic = () => {
           ...prev,
           aiLoadingStatus: {
             status: 'retrying_format_error',
-            message: `助手${errorType === 'format' ? '响应格式' : 'API调用'}错误，重试中 (${attempt}/${maxAttempts})...`,
+            message: `助手${_errorType === 'format' ? '响应格式' : 'API调用'}错误，重试中 (${attempt}/${maxAttempts})...`,
           },
         }));
       };
@@ -1874,7 +1875,8 @@ export const useGameLogic = () => {
     if (
       gameState.gameMode === GameMode.CUSTOMIZE_RANDOM_START &&
       !gameState.initialProfileGenerated &&
-      gameState.aiLoadingStatus.status === 'idle'
+      gameState.aiLoadingStatus.status === 'idle' &&
+      !isLoadingFromSave // Don't auto-generate if we're loading from saved state
     ) {
       triggerAIStory('GENERATE_FULL_RANDOM_PROFILE', true);
     }
@@ -1882,6 +1884,7 @@ export const useGameLogic = () => {
     gameState.gameMode,
     gameState.initialProfileGenerated,
     gameState.aiLoadingStatus.status,
+    isLoadingFromSave,
     triggerAIStory,
   ]);
 
@@ -2157,6 +2160,7 @@ export const useGameLogic = () => {
   const loadSavedGameState = useCallback(() => {
     const savedState = loadGameState();
     if (savedState) {
+      setIsLoadingFromSave(true); // Set flag to prevent auto-generation
       setGameState(savedState);
       // Set appropriate static segment based on loaded state
       if (savedState.gameMode === GameMode.ADVENTURE) {
@@ -2166,12 +2170,17 @@ export const useGameLogic = () => {
       } else if (savedState.initialProfileGenerated) {
         setCurrentStaticSegmentId('CUSTOMIZED_START_READY');
       }
+      // Clear the flag after a short delay to allow state to stabilize
+      setTimeout(() => {
+        setIsLoadingFromSave(false);
+      }, 100);
     }
   }, []);
 
   // Function to start fresh game (clear saved state)
   const startFreshGame = useCallback(() => {
     clearSavedGameState();
+    setIsLoadingFromSave(false); // Clear the flag
     setGameState(INITIAL_GAME_STATE);
     setCurrentStaticSegmentId('INITIAL_PROFILE_PREPARATION');
   }, []);
