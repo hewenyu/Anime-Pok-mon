@@ -172,7 +172,7 @@ export async function fetchStoryContinuation(
 
   try {
     const response: GenerateContentResponse = await ai.models.generateContent({
-      model: "gemini-2.5-flash-preview-04-17",
+      model: "gemini-2.5-flash",
       contents: [{ role: "user", parts: [{text: userPromptContent}] }],
       config: {
         systemInstruction: systemPromptOverride, 
@@ -433,7 +433,7 @@ export async function classifyCustomizationIntent(
     let jsonText = "";
     try {
         const response = await ai.models.generateContent({
-            model: "gemini-2.5-flash-preview-04-17",
+            model: "gemini-2.5-flash",
             contents: [{ role: "user", parts: [{ text: intentClassifierPrompt }] }],
             config: {
                 systemInstruction: GEMINI_CUSTOMIZATION_INTENT_CLASSIFIER_SYSTEM_PROMPT,
@@ -480,7 +480,7 @@ export async function fetchMoveDescription(moveName: string, pokemonName?: strin
 
   try {
     const response: GenerateContentResponse = await ai.models.generateContent({
-      model: "gemini-2.5-flash-preview-04-17",
+      model: "gemini-2.5-flash",
       contents: [{ role: "user", parts: [{ text: userPrompt }] }],
       config: {
         systemInstruction: GEMINI_MOVE_DESCRIPTION_SYSTEM_PROMPT, 
@@ -533,7 +533,7 @@ export async function parsePlayerBattleCommand(
 
   try {
     const response: GenerateContentResponse = await ai.models.generateContent({
-      model: "gemini-2.5-flash-preview-04-17",
+      model: "gemini-2.5-flash",
       contents: [{ role: "user", parts: [{ text: prompt }] }],
       config: {
         systemInstruction: GEMINI_BATTLE_COMMAND_PARSER_SYSTEM_PROMPT,
@@ -639,7 +639,7 @@ Please provide item action suggestions based on this context.
 
   try {
     const response: GenerateContentResponse = await ai.models.generateContent({
-      model: "gemini-2.5-flash-preview-04-17",
+      model: "gemini-2.5-flash",
       contents: [{ role: "user", parts: [{text: prompt}] }],
       config: {
         systemInstruction: GEMINI_BATTLE_ITEM_ACTION_SUGGESTOR_SYSTEM_PROMPT,

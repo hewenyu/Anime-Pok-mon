@@ -11,14 +11,7 @@
   "dependencies": {
     "react": "^19.1.0",
     "react-dom": "^19.1.0",
-    "@google/genai": "0.15.0",
-    "@/App.tsx": "latest",
-    "@/App": "latest",
-    "@/components/App": "latest",
-    "@": "latest",
-    "hooks/useGameLogic": "latest",
-    "hooks/useModals": "latest",
-    "utils/dataSanitizers": "latest"
+    "@google/genai": "0.15.0"
   },
   "devDependencies": {
     "@types/node": "^22.14.0",
