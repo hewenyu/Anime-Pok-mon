@@ -1,0 +1,50 @@
+.saveSlotItem {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 1rem;
+  border-bottom: 1px solid #eee;
+  transition: background-color 0.2s;
+}
+.saveSlotItem:hover {
+  background-color: #f9f9f9;
+}
+.saveSlotItem:last-child {
+  border-bottom: none;
+}
+.saveSlotInfo {
+  flex-grow: 1;
+}
+.playerName {
+  font-weight: bold;
+  font-size: 1.1rem;
+  color: #333;
+  margin: 0 0 0.25rem 0;
+}
+.saveTime {
+  font-size: 0.8rem;
+  color: #666;
+  margin: 0 0 0.5rem 0;
+}
+.playerDescription {
+  font-size: 0.9rem;
+  color: #555;
+  margin: 0;
+}
+.saveSlotActions {
+  display: flex;
+  gap: 0.5rem;
+  flex-shrink: 0;
+  margin-left: 1rem;
+}
+.modalContent {
+  max-width: 600px;
+}
+.list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+.newGameButton {
+  min-width: 150px;
+}

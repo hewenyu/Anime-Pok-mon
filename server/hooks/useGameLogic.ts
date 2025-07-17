@@ -13,7 +13,8 @@ import { useBattleManager } from './useBattleManager';
 
 export const useGameLogic = () => {
   const [gameState, setGameState] = useState<GameState>(INITIAL_GAME_STATE);
-  const [hasAttemptedInitialLoad, setHasAttemptedInitialLoad] = useState<boolean>(false);
+  const [hasAttemptedInitialLoad, setHasAttemptedInitialLoad] =
+    useState<boolean>(false);
 
   const advanceGameTimeInternal = (
     currentTs: number,
@@ -45,9 +46,12 @@ export const useGameLogic = () => {
     []
   );
 
-  const setGameMode = useCallback((mode: GameMode) => {
-    updateGameState(prev => ({ ...prev, gameMode: mode }));
-  }, [updateGameState]);
+  const setGameMode = useCallback(
+    (mode: GameMode) => {
+      updateGameState(prev => ({ ...prev, gameMode: mode }));
+    },
+    [updateGameState]
+  );
 
   const processAIEventImpl = useRef<
     (
@@ -77,9 +81,24 @@ export const useGameLogic = () => {
     []
   );
 
-  const characterManager = useCharacterManager(gameState, updateGameState, triggerAIStoryWrapper);
-  const storyEngine = useStoryEngine(gameState, updateGameState, processAIEventProxy, setGameMode, startBattleWrapper);
-  const battleManager = useBattleManager(gameState, updateGameState, storyEngine.advanceStaticStory, triggerAIStoryWrapper);
+  const characterManager = useCharacterManager(
+    gameState,
+    updateGameState,
+    triggerAIStoryWrapper
+  );
+  const storyEngine = useStoryEngine(
+    gameState,
+    updateGameState,
+    processAIEventProxy,
+    setGameMode,
+    startBattleWrapper
+  );
+  const battleManager = useBattleManager(
+    gameState,
+    updateGameState,
+    storyEngine.advanceStaticStory,
+    triggerAIStoryWrapper
+  );
   const saveManager = useSaveManager(gameState, setGameState);
 
   // Wrapper functions to handle dependencies correctly

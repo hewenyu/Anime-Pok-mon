@@ -42,7 +42,9 @@ const setGameSave = async (gameSave: GameSave): Promise<void> => {
  * Returns a list of save slots without the full game state for performance.
  * @returns A promise that resolves to an array of SaveSlot objects (without gameState).
  */
-export const getSavedGames = async (): Promise<(Omit<SaveSlot, 'gameState'> & { playerProfile: PlayerProfile })[]> => {
+export const getSavedGames = async (): Promise<
+  (Omit<SaveSlot, 'gameState'> & { playerProfile: PlayerProfile })[]
+> => {
   const gameSave = await getGameSave();
   return gameSave.saveSlots.map(({ slotId, timestamp, gameState }) => ({
     slotId,
@@ -69,7 +71,7 @@ export const saveGameState = async (
   };
 
   const existingSlotIndex = gameSave.saveSlots.findIndex(
-    (slot) => slot.slotId === slotId
+    slot => slot.slotId === slotId
   );
 
   if (existingSlotIndex > -1) {
@@ -88,9 +90,11 @@ export const saveGameState = async (
  * @param slotId The ID of the slot to load from.
  * @returns A promise that resolves to the GameState or null if not found.
  */
-export const loadGameState = async (slotId: number): Promise<GameState | null> => {
+export const loadGameState = async (
+  slotId: number
+): Promise<GameState | null> => {
   const gameSave = await getGameSave();
-  const saveSlot = gameSave.saveSlots.find((slot) => slot.slotId === slotId);
+  const saveSlot = gameSave.saveSlots.find(slot => slot.slotId === slotId);
   return saveSlot ? saveSlot.gameState : null;
 };
 
@@ -105,17 +109,17 @@ export const deleteGameState = async (slotId: number): Promise<void> => {
     if (!storedData) {
       return; // No save file, nothing to delete
     }
-    
+
     const gameSave: GameSave = JSON.parse(storedData);
 
     // Only proceed if version matches
     if (gameSave.version !== CURRENT_VERSION) {
-        return;
+      return;
     }
 
     const initialCount = gameSave.saveSlots.length;
     gameSave.saveSlots = gameSave.saveSlots.filter(
-      (slot) => slot.slotId !== slotId
+      slot => slot.slotId !== slotId
     );
 
     // Only write back if a change was made
@@ -124,6 +128,9 @@ export const deleteGameState = async (slotId: number): Promise<void> => {
     }
   } catch (error) {
     // If data is malformed, do nothing as per test expectations.
-    console.error('Failed to process deletion, data might be malformed:', error);
+    console.error(
+      'Failed to process deletion, data might be malformed:',
+      error
+    );
   }
 };

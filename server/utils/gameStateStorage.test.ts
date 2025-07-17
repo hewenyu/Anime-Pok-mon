@@ -79,13 +79,15 @@ describe('gameStateStorage', () => {
     });
 
     it('should return an empty array if version mismatches', async () => {
-        const gameSave: GameSave = {
-            version: 'old-version',
-            saveSlots: [{ slotId: 1, timestamp: Date.now(), gameState: mockGameState(1) }],
-        };
-        window.localStorage.setItem(GAME_SAVES_KEY, JSON.stringify(gameSave));
-        const savedGames = await getSavedGames();
-        expect(savedGames).toEqual([]);
+      const gameSave: GameSave = {
+        version: 'old-version',
+        saveSlots: [
+          { slotId: 1, timestamp: Date.now(), gameState: mockGameState(1) },
+        ],
+      };
+      window.localStorage.setItem(GAME_SAVES_KEY, JSON.stringify(gameSave));
+      const savedGames = await getSavedGames();
+      expect(savedGames).toEqual([]);
     });
   });
 
@@ -95,7 +97,9 @@ describe('gameStateStorage', () => {
       const slotId = 1;
       await saveGameState(slotId, gameState);
 
-      const savedData: GameSave = JSON.parse(window.localStorage.getItem(GAME_SAVES_KEY)!);
+      const savedData: GameSave = JSON.parse(
+        window.localStorage.getItem(GAME_SAVES_KEY)!
+      );
       expect(savedData.version).toBe(CURRENT_VERSION);
       expect(savedData.saveSlots).toHaveLength(1);
       expect(savedData.saveSlots[0].slotId).toBe(slotId);
@@ -114,27 +118,43 @@ describe('gameStateStorage', () => {
       const newSlotId = 2;
       await saveGameState(newSlotId, newState);
 
-      const savedData: GameSave = JSON.parse(window.localStorage.getItem(GAME_SAVES_KEY)!);
+      const savedData: GameSave = JSON.parse(
+        window.localStorage.getItem(GAME_SAVES_KEY)!
+      );
       expect(savedData.saveSlots).toHaveLength(2);
-      expect(savedData.saveSlots.find(s => s.slotId === existingSlotId)?.gameState).toEqual(existingState);
-      expect(savedData.saveSlots.find(s => s.slotId === newSlotId)?.gameState).toEqual(newState);
+      expect(
+        savedData.saveSlots.find(s => s.slotId === existingSlotId)?.gameState
+      ).toEqual(existingState);
+      expect(
+        savedData.saveSlots.find(s => s.slotId === newSlotId)?.gameState
+      ).toEqual(newState);
     });
 
     it('should overwrite an existing save slot with the same id', async () => {
       const originalTimestamp = Date.now() - 10000;
       const gameSave: GameSave = {
         version: CURRENT_VERSION,
-        saveSlots: [{ slotId: 1, timestamp: originalTimestamp, gameState: mockGameState(1) }],
+        saveSlots: [
+          {
+            slotId: 1,
+            timestamp: originalTimestamp,
+            gameState: mockGameState(1),
+          },
+        ],
       };
       window.localStorage.setItem(GAME_SAVES_KEY, JSON.stringify(gameSave));
 
       const newGameState = mockGameState(99); // new data
       await saveGameState(1, newGameState);
 
-      const savedData: GameSave = JSON.parse(window.localStorage.getItem(GAME_SAVES_KEY)!);
+      const savedData: GameSave = JSON.parse(
+        window.localStorage.getItem(GAME_SAVES_KEY)!
+      );
       expect(savedData.saveSlots).toHaveLength(1);
       expect(savedData.saveSlots[0].gameState).toEqual(newGameState);
-      expect(savedData.saveSlots[0].timestamp).toBeGreaterThan(originalTimestamp);
+      expect(savedData.saveSlots[0].timestamp).toBeGreaterThan(
+        originalTimestamp
+      );
     });
 
     it('should handle errors during stringification gracefully', async () => {
@@ -158,7 +178,9 @@ describe('gameStateStorage', () => {
     it('should return null if the specified slotId does not exist', async () => {
       const gameSave: GameSave = {
         version: CURRENT_VERSION,
-        saveSlots: [{ slotId: 1, timestamp: Date.now(), gameState: mockGameState(1) }],
+        saveSlots: [
+          { slotId: 1, timestamp: Date.now(), gameState: mockGameState(1) },
+        ],
       };
       window.localStorage.setItem(GAME_SAVES_KEY, JSON.stringify(gameSave));
 
@@ -189,13 +211,15 @@ describe('gameStateStorage', () => {
     });
 
     it('should return null if the version mismatches', async () => {
-        const gameSave: GameSave = {
-            version: 'old-version',
-            saveSlots: [{ slotId: 1, timestamp: Date.now(), gameState: mockGameState(1) }],
-        };
-        window.localStorage.setItem(GAME_SAVES_KEY, JSON.stringify(gameSave));
-        const result = await loadGameState(1);
-        expect(result).toBeNull();
+      const gameSave: GameSave = {
+        version: 'old-version',
+        saveSlots: [
+          { slotId: 1, timestamp: Date.now(), gameState: mockGameState(1) },
+        ],
+      };
+      window.localStorage.setItem(GAME_SAVES_KEY, JSON.stringify(gameSave));
+      const result = await loadGameState(1);
+      expect(result).toBeNull();
     });
   });
 
@@ -214,7 +238,9 @@ describe('gameStateStorage', () => {
 
       await deleteGameState(1);
 
-      const savedData: GameSave = JSON.parse(window.localStorage.getItem(GAME_SAVES_KEY)!);
+      const savedData: GameSave = JSON.parse(
+        window.localStorage.getItem(GAME_SAVES_KEY)!
+      );
       expect(savedData.saveSlots).toHaveLength(1);
       expect(savedData.saveSlots[0].slotId).toBe(2);
     });
@@ -223,13 +249,17 @@ describe('gameStateStorage', () => {
       const gameState1 = mockGameState(1);
       const gameSave: GameSave = {
         version: CURRENT_VERSION,
-        saveSlots: [{ slotId: 1, timestamp: Date.now(), gameState: gameState1 }],
+        saveSlots: [
+          { slotId: 1, timestamp: Date.now(), gameState: gameState1 },
+        ],
       };
       window.localStorage.setItem(GAME_SAVES_KEY, JSON.stringify(gameSave));
 
       await deleteGameState(99); // Try to delete a non-existent slot
 
-      const savedData: GameSave = JSON.parse(window.localStorage.getItem(GAME_SAVES_KEY)!);
+      const savedData: GameSave = JSON.parse(
+        window.localStorage.getItem(GAME_SAVES_KEY)!
+      );
       expect(savedData.saveSlots).toHaveLength(1);
     });
 
@@ -239,10 +269,10 @@ describe('gameStateStorage', () => {
     });
 
     it('should handle malformed data gracefully', async () => {
-        window.localStorage.setItem(GAME_SAVES_KEY, 'invalid json');
-        await deleteGameState(1);
-        // Expect no error to be thrown, and the invalid data is still there
-        expect(window.localStorage.getItem(GAME_SAVES_KEY)).toBe('invalid json');
+      window.localStorage.setItem(GAME_SAVES_KEY, 'invalid json');
+      await deleteGameState(1);
+      // Expect no error to be thrown, and the invalid data is still there
+      expect(window.localStorage.getItem(GAME_SAVES_KEY)).toBe('invalid json');
     });
   });
 });

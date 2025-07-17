@@ -532,7 +532,6 @@ export interface BattleCommandParseContext {
   inventory: InventoryItem[];
 }
 
-
 /**
  * Represents a single save slot containing the full game state.
  */

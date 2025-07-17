@@ -46,7 +46,12 @@ describe('useGameLogic Hook with Save/Load Logic', () => {
     const mockSavedState: GameState = {
       ...INITIAL_GAME_STATE,
       gameMode: GameMode.ADVENTURE,
-      playerProfile: { name: 'Mock Player', gender: '男', age: 20, description: 'A test player.' },
+      playerProfile: {
+        name: 'Mock Player',
+        gender: '男',
+        age: 20,
+        description: 'A test player.',
+      },
       money: 500,
     };
     mockLoadGameState.mockResolvedValue(mockSavedState);
@@ -67,7 +72,7 @@ describe('useGameLogic Hook with Save/Load Logic', () => {
 
   it('should not call createNewCharacter or similar functions if saved games exist', async () => {
     mockGetSavedGames.mockResolvedValue([{ slotId: 1, timestamp: Date.now() }]);
-    
+
     // We need to spy on triggerAIStory to check if it's called.
     // Since it's part of the hook's internal logic, we can't easily mock it from outside.
     // Instead, we check a side effect: the game state should remain initial,

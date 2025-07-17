@@ -116,7 +116,9 @@ export const useStoryEngine = (
         }));
       };
 
-      const handleStreamCallback: OnStreamCallback = (_partialResponse: string) => {
+      const handleStreamCallback: OnStreamCallback = (
+        _partialResponse: string
+      ) => {
         updateGameState(prev => ({
           ...prev,
           aiLoadingStatus: {
@@ -310,11 +312,11 @@ export const useStoryEngine = (
               aiLoadingStatus: { status: 'idle' } as LoadingStatus,
             };
 
-            let resolvedSpeaker: string | undefined =
+            const resolvedSpeaker: string | undefined =
               typeof newSegment.speaker === 'function'
                 ? newSegment.speaker(tempState.playerProfile)
                 : newSegment.speaker;
-            let resolvedText: string =
+            const resolvedText: string =
               typeof newSegment.text === 'function'
                 ? newSegment.text(tempState.playerProfile, tempState.playerTeam)
                 : newSegment.text;
@@ -556,7 +558,9 @@ export const useStoryEngine = (
         }));
       };
 
-      const handleStreamCallback: OnStreamCallback = (_partialResponse: string) => {
+      const handleStreamCallback: OnStreamCallback = (
+        _partialResponse: string
+      ) => {
         updateGameState(prev => ({
           ...prev,
           aiLoadingStatus: {
@@ -701,7 +705,9 @@ export const useStoryEngine = (
         }));
       };
 
-      const handleStreamCallback: OnStreamCallback = (_partialResponse: string) => {
+      const handleStreamCallback: OnStreamCallback = (
+        _partialResponse: string
+      ) => {
         updateGameState(prev => ({
           ...prev,
           aiLoadingStatus: {
@@ -767,7 +773,7 @@ export const useStoryEngine = (
     },
     [gameState, updateGameState]
   );
-  
+
   const handleRegeneratePokemonImage = useCallback(
     (instanceId: string) => {
       const pokemonToRegen =
@@ -809,10 +815,7 @@ export const useStoryEngine = (
   );
 
   const processStoryEvent = useCallback(
-    (
-      currentState: GameState,
-      event: AIEventTrigger
-    ): GameState => {
+    (currentState: GameState, event: AIEventTrigger): GameState => {
       let newObjective = currentState.currentObjective;
       let newLocation = currentState.currentLocationDescription;
       let newAreaMap = currentState.currentAreaMap;
@@ -897,7 +900,6 @@ export const useStoryEngine = (
     },
     []
   );
-
 
   return {
     currentStaticSegmentId,

@@ -175,22 +175,36 @@ export const useBattleManager = (
                 type: 'system',
               });
 
-              const oldStats = { maxHp: updatedPokemon.maxHp, attack: updatedPokemon.attack, defense: updatedPokemon.defense, specialAttack: updatedPokemon.specialAttack, specialDefense: updatedPokemon.specialDefense, speed: updatedPokemon.speed };
+              const oldStats = {
+                maxHp: updatedPokemon.maxHp,
+                attack: updatedPokemon.attack,
+                defense: updatedPokemon.defense,
+                specialAttack: updatedPokemon.specialAttack,
+                specialDefense: updatedPokemon.specialDefense,
+                speed: updatedPokemon.speed,
+              };
               updatedPokemon.maxHp += Math.floor(Math.random() * 4) + 2;
               updatedPokemon.attack += Math.floor(Math.random() * 3) + 1;
               updatedPokemon.defense += Math.floor(Math.random() * 3) + 1;
               updatedPokemon.specialAttack += Math.floor(Math.random() * 3) + 1;
-              updatedPokemon.specialDefense += Math.floor(Math.random() * 3) + 1;
+              updatedPokemon.specialDefense +=
+                Math.floor(Math.random() * 3) + 1;
               updatedPokemon.speed += Math.floor(Math.random() * 3) + 1;
               updatedPokemon.currentHp = updatedPokemon.maxHp;
 
               let statIncreaseNarrative = `${updatedPokemon.name} 的能力提升了：`;
-              if (updatedPokemon.maxHp > oldStats.maxHp) statIncreaseNarrative += ` 最大HP+${updatedPokemon.maxHp - oldStats.maxHp}`;
-              if (updatedPokemon.attack > oldStats.attack) statIncreaseNarrative += ` 攻击+${updatedPokemon.attack - oldStats.attack}`;
-              if (updatedPokemon.defense > oldStats.defense) statIncreaseNarrative += ` 防御+${updatedPokemon.defense - oldStats.defense}`;
-              if (updatedPokemon.specialAttack > oldStats.specialAttack) statIncreaseNarrative += ` 特攻+${updatedPokemon.specialAttack - oldStats.specialAttack}`;
-              if (updatedPokemon.specialDefense > oldStats.specialDefense) statIncreaseNarrative += ` 特防+${updatedPokemon.specialDefense - oldStats.specialDefense}`;
-              if (updatedPokemon.speed > oldStats.speed) statIncreaseNarrative += ` 速度+${updatedPokemon.speed - oldStats.speed}`;
+              if (updatedPokemon.maxHp > oldStats.maxHp)
+                statIncreaseNarrative += ` 最大HP+${updatedPokemon.maxHp - oldStats.maxHp}`;
+              if (updatedPokemon.attack > oldStats.attack)
+                statIncreaseNarrative += ` 攻击+${updatedPokemon.attack - oldStats.attack}`;
+              if (updatedPokemon.defense > oldStats.defense)
+                statIncreaseNarrative += ` 防御+${updatedPokemon.defense - oldStats.defense}`;
+              if (updatedPokemon.specialAttack > oldStats.specialAttack)
+                statIncreaseNarrative += ` 特攻+${updatedPokemon.specialAttack - oldStats.specialAttack}`;
+              if (updatedPokemon.specialDefense > oldStats.specialDefense)
+                statIncreaseNarrative += ` 特防+${updatedPokemon.specialDefense - oldStats.specialDefense}`;
+              if (updatedPokemon.speed > oldStats.speed)
+                statIncreaseNarrative += ` 速度+${updatedPokemon.speed - oldStats.speed}`;
 
               tempNewChatHistory.push({
                 id: `stats-up-${updatedPokemon.instanceId}-${newLevel}-${Date.now()}`,
@@ -200,29 +214,42 @@ export const useBattleManager = (
                 type: 'system',
               });
 
-              updatedPokemon.xpToNextLevel = Math.floor(Math.pow(newLevel, 2.8)) + newLevel * 25 + 75;
+              updatedPokemon.xpToNextLevel =
+                Math.floor(Math.pow(newLevel, 2.8)) + newLevel * 25 + 75;
             }
             return updatedPokemon;
           }
           return pokemon;
         });
-        resultSegmentId = gameState.battleReturnSegmentWin || 'BATTLE_WON_DEFAULT';
+        resultSegmentId =
+          gameState.battleReturnSegmentWin || 'BATTLE_WON_DEFAULT';
       } else if (usedRun) {
         resultSegmentId = 'PLAYER_RAN_AWAY';
       } else {
-        resultSegmentId = gameState.battleReturnSegmentLose || 'BATTLE_LOST_DEFAULT';
+        resultSegmentId =
+          gameState.battleReturnSegmentLose || 'BATTLE_LOST_DEFAULT';
       }
 
       const battleRecord: BattleRecord = {
         id: `battle-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
         timestamp: Date.now(),
-        playerPokemon: finalPlayerTeamFromBattle.find(p => !p.isFainted)?.name || '未知',
+        playerPokemon:
+          finalPlayerTeamFromBattle.find(p => !p.isFainted)?.name || '未知',
         enemyPokemon: finalEnemyPokemonState.name,
         location: gameState.currentLocationDescription,
-        outcome: caughtPokemon ? 'catch' : usedRun ? 'run' : didPlayerWin ? 'win' : 'loss',
+        outcome: caughtPokemon
+          ? 'catch'
+          : usedRun
+            ? 'run'
+            : didPlayerWin
+              ? 'win'
+              : 'loss',
         battleLog: battleLog || [],
         caughtPokemon: caughtPokemon?.name,
-        duration: battleLog && battleLog.length > 0 ? battleLog[battleLog.length - 1].timestamp - battleLog[0].timestamp : undefined,
+        duration:
+          battleLog && battleLog.length > 0
+            ? battleLog[battleLog.length - 1].timestamp - battleLog[0].timestamp
+            : undefined,
       };
 
       updateGameState(
@@ -240,7 +267,10 @@ export const useBattleManager = (
           battleHistory: [...(prev.battleHistory || []), battleRecord],
         }),
         {
-          minutes: Math.floor(Math.random() * (didPlayerWin || caughtPokemon ? 61 : 91)) + (didPlayerWin || caughtPokemon ? 15 : 30),
+          minutes:
+            Math.floor(
+              Math.random() * (didPlayerWin || caughtPokemon ? 61 : 91)
+            ) + (didPlayerWin || caughtPokemon ? 15 : 30),
         }
       );
 
@@ -264,19 +294,18 @@ export const useBattleManager = (
         if (caughtPokemon) {
           fallbackActionTag = 'PLAYER_CAUGHT_POKEMON_CONTINUE_ADVENTURE';
         } else if (!usedRun) {
-          fallbackActionTag = didPlayerWin ? 'PLAYER_WON_BATTLE' : 'PLAYER_LOST_BATTLE';
+          fallbackActionTag = didPlayerWin
+            ? 'PLAYER_WON_BATTLE'
+            : 'PLAYER_LOST_BATTLE';
         }
         triggerAIStory(fallbackActionTag);
       }
     },
     [gameState, updateGameState, advanceStaticStory, triggerAIStory]
   );
-  
+
   const processBattleEvent = useCallback(
-    (
-      currentState: GameState,
-      event: AIEventTrigger
-    ): GameState => {
+    (currentState: GameState, event: AIEventTrigger): GameState => {
       if (event.type === 'START_BATTLE' && event.enemyPokemonDetails) {
         const enemyFromAI = sanitizePokemonData(event.enemyPokemonDetails);
         return {
