@@ -7,6 +7,7 @@ import { sanitizePokemonData, sanitizeItemData } from '../utils/dataSanitizers';
 // Fix: Added missing import for STORY_DATA
 import { STORY_DATA } from '../constants'; // Corrected path
 
+import MainMenu from './MainMenu.tsx';
 import AdventureView from './AdventureView.tsx';
 import BattleView from './BattleView.tsx';
 import HistoryModal from './HistoryModal.tsx';
@@ -17,15 +18,19 @@ import CustomizeRandomStartScreen from './CustomizeRandomStartScreen.tsx';
 import PlayerProfileEditModal from './PlayerProfileEditModal.tsx';
 import InventoryModal from './InventoryModal.tsx';
 import PokemonDetailModal from './PokemonDetailModal.tsx';
+import BattleHistoryModal from './BattleHistoryModal.tsx';
+import SaveGameModal from './SaveGameModal.tsx';
 
 const App: React.FC = () => {
+  // State for save game modal
+  const [showSaveModal, setShowSaveModal] = React.useState(false);
+
   const gameLogic = useGameLogic();
   const {
     gameState,
-    // updateGameState, // Direct updateGameState is less used, actions are preferred
-    currentStaticSegmentId, // Keep if AdventureView still needs it directly for rendering static content
+    currentStaticSegmentId,
     handleStaticStoryChoice,
-    triggerAIStory, // Main AI trigger
+    triggerAIStory,
     handleAIChoice,
     handlePlayerCustomInputAction,
     handleBattleEnd,
@@ -36,13 +41,16 @@ const App: React.FC = () => {
     handleStartAdventureWithCustomizedProfile,
     handleDirectCustomizationUpdate,
     handleSendCustomizationAssistantMessage,
-    requestDynamicTimeSuggestion, // Added from useGameLogic
+    requestDynamicTimeSuggestion,
     handleSavePlayerProfileChanges,
     handleRegeneratePokemonImage,
     fetchInitialNPCDialogueAndOrSuggestions,
     handleSendPlayerMessageToNPC,
     npcInteractionLoading,
-    clearCustomizationAssistantResponse, // Added
+    clearCustomizationAssistantResponse,
+    loadGame,
+    deleteGame,
+    setGameMode,
   } = gameLogic;
 
   const {
@@ -61,6 +69,8 @@ const App: React.FC = () => {
     togglePlayerProfileEditModal,
     showInventoryModal,
     toggleInventoryModal,
+    showBattleHistoryModal,
+    toggleBattleHistoryModal,
     pokemonToViewInModal,
     openPokemonDetailModal,
     closePokemonDetailModal,
@@ -76,6 +86,11 @@ const App: React.FC = () => {
       setSelectedNPCForChat,
       setNpcChatSuggestions
     );
+  };
+
+  const handleNewGame = () => {
+    // Set game mode to customize random start for new game
+    setGameMode(GameMode.CUSTOMIZE_RANDOM_START);
   };
 
   const memoizedHandleSendPlayerMessageToNPC = (
@@ -104,6 +119,15 @@ const App: React.FC = () => {
     const isLoadingAI = gameState.aiLoadingStatus.status !== 'idle';
 
     switch (gameState.gameMode) {
+      case GameMode.MAIN_MENU:
+        return (
+          <MainMenu
+            onLoadGame={loadGame}
+            onNewGame={handleNewGame}
+            onDeleteGame={deleteGame}
+          />
+        );
+
       case GameMode.CUSTOMIZE_RANDOM_START:
         return (
           <CustomizeRandomStartScreen
@@ -214,6 +238,8 @@ const App: React.FC = () => {
             onEditPlayerProfile={togglePlayerProfileEditModal}
             onRegeneratePokemonImage={handleRegeneratePokemonImage}
             onOpenPokemonDetailModal={openPokemonDetailModal} // Pass the function
+            onToggleBattleHistoryModal={toggleBattleHistoryModal} // Added
+            onSaveGame={() => setShowSaveModal(true)} // Added save functionality
           />
         );
         break;
@@ -279,6 +305,19 @@ const App: React.FC = () => {
   return (
     <>
       {renderContent()}
+
+      {/* Save Game Modal */}
+      {showSaveModal && (
+        <SaveGameModal
+          isOpen={showSaveModal}
+          currentGameState={gameState}
+          onClose={() => setShowSaveModal(false)}
+          onSaveSuccess={() => {
+            // Optionally refresh saved games or show success message
+          }}
+        />
+      )}
+
       {showHistoryModal && (
         <HistoryModal
           isOpen={showHistoryModal}
@@ -331,6 +370,13 @@ const App: React.FC = () => {
           isOpen={showInventoryModal}
           onClose={toggleInventoryModal}
           inventory={gameState.inventory}
+        />
+      )}
+      {showBattleHistoryModal && (
+        <BattleHistoryModal
+          isOpen={showBattleHistoryModal}
+          onClose={toggleBattleHistoryModal}
+          battleHistory={gameState.battleHistory || []}
         />
       )}
       {pokemonToViewInModal && (

@@ -163,7 +163,7 @@ export interface PokemonMoveInstance {
   currentPP: number;
   description?: string;
   effects?: MoveEffect[]; // New field for detailed move effects
-  accuracy?: number; // Move accuracy (0-100, or null for always-hit)
+  accuracy?: number | null; // Move accuracy (0-100, or null for always-hit)
   priority?: number; // Move priority (default 0)
 }
 
@@ -207,6 +207,7 @@ export enum BattleGameStatus {
 }
 
 export enum GameMode {
+  MAIN_MENU = 'MAIN_MENU',
   CUSTOMIZE_RANDOM_START = 'CUSTOMIZE_RANDOM_START',
   ADVENTURE = 'ADVENTURE',
   BATTLE = 'BATTLE',
@@ -407,6 +408,9 @@ export interface GameState {
   chatHistory: ChatHistoryEntry[]; // Main game/event log.
   knownNPCs: NPC[];
 
+  // Battle history tracking
+  battleHistory: BattleRecord[]; // Detailed battle records
+
   initialProfileGenerated: boolean;
   // Store for the AI's suggested start time from profile generation (Unix ms timestamp)
   aiSuggestedGameStartTime?: number;
@@ -474,6 +478,18 @@ export type BattleChatMessageType =
   | 'system_message'
   | 'ai_feedback'
   | 'ai_item_action_suggestion';
+export interface BattleRecord {
+  id: string;
+  timestamp: number;
+  playerPokemon: string; // Pokemon name
+  enemyPokemon: string; // Pokemon name
+  location: string;
+  outcome: 'win' | 'loss' | 'run' | 'catch';
+  battleLog: BattleChatMessage[]; // Detailed battle transcript
+  caughtPokemon?: string; // Name of caught Pokemon if applicable
+  duration?: number; // Battle duration in milliseconds
+}
+
 export interface BattleChatMessage {
   id: string;
   speaker: string;
@@ -514,4 +530,21 @@ export interface BattleCommandParseContext {
   enemyPokemon: Pokemon | undefined;
   playerTeam: Pokemon[];
   inventory: InventoryItem[];
+}
+
+/**
+ * Represents a single save slot containing the full game state.
+ */
+export interface SaveSlot {
+  slotId: number;
+  timestamp: number;
+  gameState: GameState;
+}
+
+/**
+ * The top-level object stored in localStorage, containing all save slots.
+ */
+export interface GameSave {
+  version: string;
+  saveSlots: SaveSlot[];
 }
