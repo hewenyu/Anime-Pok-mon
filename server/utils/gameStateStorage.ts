@@ -1,4 +1,4 @@
-import { GameState, GameSave, SaveSlot } from '../types';
+import { GameState, GameSave, SaveSlot, PlayerProfile } from '../types';
 
 const GAME_SAVES_KEY = 'game_saves';
 const CURRENT_VERSION = '1.0.0';
@@ -42,11 +42,12 @@ const setGameSave = async (gameSave: GameSave): Promise<void> => {
  * Returns a list of save slots without the full game state for performance.
  * @returns A promise that resolves to an array of SaveSlot objects (without gameState).
  */
-export const getSavedGames = async (): Promise<Omit<SaveSlot, 'gameState'>[]> => {
+export const getSavedGames = async (): Promise<(Omit<SaveSlot, 'gameState'> & { playerProfile: PlayerProfile })[]> => {
   const gameSave = await getGameSave();
-  return gameSave.saveSlots.map(({ slotId, timestamp }) => ({
+  return gameSave.saveSlots.map(({ slotId, timestamp, gameState }) => ({
     slotId,
     timestamp,
+    playerProfile: gameState.playerProfile,
   }));
 };
 

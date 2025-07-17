@@ -1,17 +1,30 @@
 import React from 'react';
+import { PlayerProfile } from '../types';
+import ActionButton from './ActionButton';
+
+// The type for a save slot summary, as returned by the modified getSavedGames
+type SaveSlotSummary = {
+  slotId: number;
+  timestamp: number;
+  playerProfile: PlayerProfile;
+};
 
 interface ContinueGameModalProps {
   isOpen: boolean;
-  savedGameTimestamp: number;
-  onContinue: () => void;
-  onRestart: () => void;
+  savedGames: SaveSlotSummary[];
+  onLoadGame: (slotId: number) => void;
+  onDeleteGame: (slotId: number) => void;
+  onClose: () => void; // To close the modal, e.g., when starting a new game
+  onNewGame: () => void;
 }
 
 const ContinueGameModal: React.FC<ContinueGameModalProps> = ({
   isOpen,
-  savedGameTimestamp,
-  onContinue,
-  onRestart,
+  savedGames,
+  onLoadGame,
+  onDeleteGame,
+  onClose,
+  onNewGame,
 }) => {
   if (!isOpen) return null;
 
@@ -28,48 +41,100 @@ const ContinueGameModal: React.FC<ContinueGameModalProps> = ({
 
   return (
     <div className="modal-overlay-base">
-      <div className="modal-content-base" style={{ maxWidth: '500px' }}>
+      <div className="modal-content-base" style={{ maxWidth: '600px' }}>
         <div className="modal-header-base">
           <h2>继续冒险</h2>
+          <button onClick={onClose} className="modal-close-button">&times;</button>
         </div>
 
         <div className="modal-body-base">
-          <div className="text-center mb-6">
-            <div className="mb-4">
-              <div className="text-lg mb-2">发现了上次的冒险记录！</div>
-              <div className="text-sm text-gray-600">
-                保存时间：{formatSavedTime(savedGameTimestamp)}
-              </div>
+          {savedGames.length > 0 ? (
+            <ul style={{ listStyle: 'none', padding: 0, margin: 0 }}>
+              {savedGames.map((slot) => (
+                <li key={slot.slotId} className="save-slot-item">
+                  <div className="save-slot-info">
+                    <p className="player-name">{slot.playerProfile.name || '无名英雄'}</p>
+                    <p className="save-time">存档于: {formatSavedTime(slot.timestamp)}</p>
+                    <p className="player-description">{slot.playerProfile.description || '一段未知的旅程...'}</p>
+                  </div>
+                  <div className="save-slot-actions">
+                    <ActionButton
+                      onClick={() => {
+                        onLoadGame(slot.slotId);
+                        onClose();
+                      }}
+                      className="choice-button"
+                    >
+                      加载
+                    </ActionButton>
+                    <ActionButton
+                      onClick={() => onDeleteGame(slot.slotId)}
+                      className="choice-button secondary"
+                    >
+                      删除
+                    </ActionButton>
+                  </div>
+                </li>
+              ))}
+            </ul>
+          ) : (
+            <div className="text-center p-8">
+              <p className="text-lg text-gray-600">无存档记录</p>
+              <p className="text-sm text-gray-500 mt-2">开始一段新的冒险吧！</p>
             </div>
-
-            <div className="text-base mb-6">
-              你想要继续上次的冒险，还是开始全新的冒险？
-            </div>
-
-            <div className="flex gap-4 justify-center">
-              <button
+          )}
+           <div className="mt-6 text-center">
+             <ActionButton
+                onClick={onNewGame}
                 className="choice-button"
-                onClick={onContinue}
-                style={{ minWidth: '120px' }}
+                style={{ minWidth: '150px' }}
               >
-                继续冒险
-              </button>
-
-              <button
-                className="choice-button secondary"
-                onClick={onRestart}
-                style={{ minWidth: '120px' }}
-              >
-                重新开始
-              </button>
-            </div>
-
-            <div className="text-xs text-gray-500 mt-4">
-              选择&quot;重新开始&quot;将清除之前的存档
-            </div>
-          </div>
+                开始新游戏
+              </ActionButton>
+           </div>
         </div>
       </div>
+      <style>{`
+        .save-slot-item {
+          display: flex;
+          justify-content: space-between;
+          align-items: center;
+          padding: 1rem;
+          border-bottom: 1px solid #eee;
+          transition: background-color 0.2s;
+        }
+        .save-slot-item:hover {
+          background-color: #f9f9f9;
+        }
+        .save-slot-item:last-child {
+          border-bottom: none;
+        }
+        .save-slot-info {
+          flex-grow: 1;
+        }
+        .player-name {
+          font-weight: bold;
+          font-size: 1.1rem;
+          color: #333;
+          margin: 0 0 0.25rem 0;
+        }
+        .save-time {
+          font-size: 0.8rem;
+          color: #666;
+          margin: 0 0 0.5rem 0;
+        }
+        .player-description {
+            font-size: 0.9rem;
+            color: #555;
+            margin: 0;
+        }
+        .save-slot-actions {
+          display: flex;
+          gap: 0.5rem;
+          flex-shrink: 0;
+          margin-left: 1rem;
+        }
+      `}</style>
     </div>
   );
 };

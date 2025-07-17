@@ -4,10 +4,7 @@ import { GameMode, NPC, StorySegment } from '../types'; // Corrected path
 import { useGameLogic } from '../hooks/useGameLogic'; // Corrected path
 import { useModals } from '../hooks/useModals'; // Corrected path
 import { sanitizePokemonData, sanitizeItemData } from '../utils/dataSanitizers'; // Corrected path
-import {
-  hasSavedGameState,
-  getSavedGameTimestamp,
-} from '../utils/gameStateStorage';
+import {} from '../utils/gameStateStorage';
 // Fix: Added missing import for STORY_DATA
 import { STORY_DATA } from '../constants'; // Corrected path
 
@@ -32,10 +29,9 @@ const App: React.FC = () => {
   const gameLogic = useGameLogic();
   const {
     gameState,
-    // updateGameState, // Direct updateGameState is less used, actions are preferred
-    currentStaticSegmentId, // Keep if AdventureView still needs it directly for rendering static content
+    currentStaticSegmentId,
     handleStaticStoryChoice,
-    triggerAIStory, // Main AI trigger
+    triggerAIStory,
     handleAIChoice,
     handlePlayerCustomInputAction,
     handleBattleEnd,
@@ -46,15 +42,16 @@ const App: React.FC = () => {
     handleStartAdventureWithCustomizedProfile,
     handleDirectCustomizationUpdate,
     handleSendCustomizationAssistantMessage,
-    requestDynamicTimeSuggestion, // Added from useGameLogic
+    requestDynamicTimeSuggestion,
     handleSavePlayerProfileChanges,
     handleRegeneratePokemonImage,
     fetchInitialNPCDialogueAndOrSuggestions,
     handleSendPlayerMessageToNPC,
     npcInteractionLoading,
-    clearCustomizationAssistantResponse, // Added
-    loadSavedGameState,
-    startFreshGame,
+    clearCustomizationAssistantResponse,
+    loadGame,
+    deleteGame,
+    saveGame,
   } = gameLogic;
 
   const {
@@ -92,27 +89,9 @@ const App: React.FC = () => {
     );
   };
 
-  // Check for saved game state on component mount
-  React.useEffect(() => {
-    if (hasSavedGameState()) {
-      const timestamp = getSavedGameTimestamp();
-      if (timestamp) {
-        setSavedGameTimestamp(timestamp);
-        setShowContinueModal(true);
-      }
-    }
-  }, []);
-
-  // Handle continue game modal actions
-  const handleContinueGame = () => {
-    loadSavedGameState();
-    setShowContinueModal(false);
-  };
-
-  const handleRestartGame = () => {
-    startFreshGame();
-    setShowContinueModal(false);
-  };
+  // This logic is now handled within useSaveManager, so we can remove it.
+  // The ContinueGameModal might need to be re-evaluated or adapted to the new multi-slot system.
+  // For now, we'll remove the old logic.
 
   const memoizedHandleSendPlayerMessageToNPC = (
     npcId: string,
@@ -318,12 +297,14 @@ const App: React.FC = () => {
       {renderContent()}
 
       {/* Continue Game Modal */}
-      <ContinueGameModal
+      {/* The ContinueGameModal needs to be updated to work with the new multi-slot save system.
+          This will be handled in a future task. For now, it's commented out. */}
+      {/* <ContinueGameModal
         isOpen={showContinueModal}
         savedGameTimestamp={savedGameTimestamp}
         onContinue={handleContinueGame}
         onRestart={handleRestartGame}
-      />
+      /> */}
 
       {showHistoryModal && (
         <HistoryModal
