@@ -6,7 +6,7 @@ import {
   deleteGameState,
 } from './gameStateStorage';
 import { GameMode } from '../types';
-import type { GameState, SaveSlot, GameSave } from '../types';
+import type { GameState, GameSave } from '../types';
 
 const GAME_SAVES_KEY = 'game_saves';
 const CURRENT_VERSION = '1.0.0'; // Assume this is the version used in the implementation

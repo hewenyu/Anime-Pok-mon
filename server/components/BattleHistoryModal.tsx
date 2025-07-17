@@ -1,5 +1,5 @@
 import React from 'react';
-import { BattleRecord, BattleChatMessage } from '../types';
+import { BattleRecord } from '../types';
 
 interface BattleHistoryModalProps {
   isOpen: boolean;

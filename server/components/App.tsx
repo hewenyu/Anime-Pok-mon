@@ -4,10 +4,10 @@ import { GameMode, NPC, StorySegment } from '../types'; // Corrected path
 import { useGameLogic } from '../hooks/useGameLogic'; // Corrected path
 import { useModals } from '../hooks/useModals'; // Corrected path
 import { sanitizePokemonData, sanitizeItemData } from '../utils/dataSanitizers'; // Corrected path
-import {} from '../utils/gameStateStorage';
 // Fix: Added missing import for STORY_DATA
 import { STORY_DATA } from '../constants'; // Corrected path
 
+import MainMenu from './MainMenu.tsx';
 import AdventureView from './AdventureView.tsx';
 import BattleView from './BattleView.tsx';
 import HistoryModal from './HistoryModal.tsx';
@@ -18,13 +18,12 @@ import CustomizeRandomStartScreen from './CustomizeRandomStartScreen.tsx';
 import PlayerProfileEditModal from './PlayerProfileEditModal.tsx';
 import InventoryModal from './InventoryModal.tsx';
 import PokemonDetailModal from './PokemonDetailModal.tsx';
-import ContinueGameModal from './ContinueGameModal.tsx';
 import BattleHistoryModal from './BattleHistoryModal.tsx';
+import SaveGameModal from './SaveGameModal.tsx';
 
 const App: React.FC = () => {
-  // State for continue game modal
-  const [showContinueModal, setShowContinueModal] = React.useState(false);
-  const [savedGameTimestamp, setSavedGameTimestamp] = React.useState<number>(0);
+  // State for save game modal
+  const [showSaveModal, setShowSaveModal] = React.useState(false);
 
   const gameLogic = useGameLogic();
   const {
@@ -51,7 +50,7 @@ const App: React.FC = () => {
     clearCustomizationAssistantResponse,
     loadGame,
     deleteGame,
-    saveGame,
+    setGameMode,
   } = gameLogic;
 
   const {
@@ -89,9 +88,10 @@ const App: React.FC = () => {
     );
   };
 
-  // This logic is now handled within useSaveManager, so we can remove it.
-  // The ContinueGameModal might need to be re-evaluated or adapted to the new multi-slot system.
-  // For now, we'll remove the old logic.
+  const handleNewGame = () => {
+    // Set game mode to customize random start for new game
+    setGameMode(GameMode.CUSTOMIZE_RANDOM_START);
+  };
 
   const memoizedHandleSendPlayerMessageToNPC = (
     npcId: string,
@@ -119,6 +119,15 @@ const App: React.FC = () => {
     const isLoadingAI = gameState.aiLoadingStatus.status !== 'idle';
 
     switch (gameState.gameMode) {
+      case GameMode.MAIN_MENU:
+        return (
+          <MainMenu
+            onLoadGame={loadGame}
+            onNewGame={handleNewGame}
+            onDeleteGame={deleteGame}
+          />
+        );
+
       case GameMode.CUSTOMIZE_RANDOM_START:
         return (
           <CustomizeRandomStartScreen
@@ -230,6 +239,7 @@ const App: React.FC = () => {
             onRegeneratePokemonImage={handleRegeneratePokemonImage}
             onOpenPokemonDetailModal={openPokemonDetailModal} // Pass the function
             onToggleBattleHistoryModal={toggleBattleHistoryModal} // Added
+            onSaveGame={() => setShowSaveModal(true)} // Added save functionality
           />
         );
         break;
@@ -296,15 +306,17 @@ const App: React.FC = () => {
     <>
       {renderContent()}
 
-      {/* Continue Game Modal */}
-      {/* The ContinueGameModal needs to be updated to work with the new multi-slot save system.
-          This will be handled in a future task. For now, it's commented out. */}
-      {/* <ContinueGameModal
-        isOpen={showContinueModal}
-        savedGameTimestamp={savedGameTimestamp}
-        onContinue={handleContinueGame}
-        onRestart={handleRestartGame}
-      /> */}
+      {/* Save Game Modal */}
+      {showSaveModal && (
+        <SaveGameModal
+          isOpen={showSaveModal}
+          currentGameState={gameState}
+          onClose={() => setShowSaveModal(false)}
+          onSaveSuccess={() => {
+            // Optionally refresh saved games or show success message
+          }}
+        />
+      )}
 
       {showHistoryModal && (
         <HistoryModal

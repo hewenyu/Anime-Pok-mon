@@ -39,6 +39,7 @@ interface AdventureViewProps {
   onRegeneratePokemonImage: (instanceId: string) => void;
   onOpenPokemonDetailModal: (pokemon: Pokemon) => void; // Added prop
   onToggleBattleHistoryModal?: () => void; // Added for battle history
+  onSaveGame?: () => void; // Added for save functionality
 }
 
 const AdventureView: React.FC<AdventureViewProps> = props => {
@@ -59,6 +60,7 @@ const AdventureView: React.FC<AdventureViewProps> = props => {
           onOpenGlobalMapModal={props.onToggleGlobalMapModal}
           onEditPlayerProfile={props.onEditPlayerProfile}
           currentGameTime={props.gameState.currentGameTime}
+          onSaveGame={props.onSaveGame}
         />
       </aside>
 

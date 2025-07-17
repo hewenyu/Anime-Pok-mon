@@ -125,7 +125,7 @@ export const useGameLogic = () => {
     (
       currentState: GameState,
       event: AIEventTrigger,
-      isNPCContext: boolean = false,
+      _isNPCContext: boolean = false,
       customizationScreenActionTag?: AICustomizationScreenActionTag
     ): GameState => {
       const stateAfterChar = characterManager.processCharacterEvent(

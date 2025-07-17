@@ -11,6 +11,7 @@ interface PlayerInfoPanelProps {
   onOpenGlobalMapModal: () => void;
   onEditPlayerProfile: () => void;
   currentGameTime: number;
+  onSaveGame?: () => void;
 }
 
 const PlayerStatBar: React.FC<{
@@ -69,6 +70,7 @@ const PlayerInfoPanel: React.FC<PlayerInfoPanelProps> = ({
   onOpenGlobalMapModal,
   onEditPlayerProfile,
   currentGameTime,
+  onSaveGame,
 }) => {
   return (
     <div className="sidebar-panel h-full overflow-y-auto custom-scrollbar flex flex-col">
@@ -166,6 +168,15 @@ const PlayerInfoPanel: React.FC<PlayerInfoPanelProps> = ({
           >
             查看世界地图
           </button>
+          {onSaveGame && (
+            <button
+              onClick={onSaveGame}
+              className="choice-button w-full text-sm mt-2 py-2 bg-green-500 hover:bg-green-600 text-white"
+              aria-label="保存游戏"
+            >
+              保存游戏
+            </button>
+          )}
         </div>
       </div>
     </div>
