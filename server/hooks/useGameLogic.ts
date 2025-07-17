@@ -52,7 +52,8 @@ import {
 import {
   saveGameState,
   loadGameState,
-  clearSavedGameState,
+  getSavedGames,
+  deleteGameState,
 } from '../utils/gameStateStorage';
 
 // Helper to convert UserDateTimeInput to a Unix timestamp
@@ -94,10 +95,11 @@ const userDateTimeToTimestamp = (input: UserDateTimeInput): number => {
 
 export const useGameLogic = () => {
   const [gameState, setGameState] = useState<GameState>(INITIAL_GAME_STATE);
+  const [savedGames, setSavedGames] = useState<Awaited<ReturnType<typeof getSavedGames>>>([]);
+  const [isLoadingFromSave, setIsLoadingFromSave] = useState(true); // Start true
   const [currentStaticSegmentId, setCurrentStaticSegmentId] = useState<string>(
     'INITIAL_PROFILE_PREPARATION'
   );
-  const [isLoadingFromSave, setIsLoadingFromSave] = useState<boolean>(false);
   const [hasAttemptedInitialLoad, setHasAttemptedInitialLoad] =
     useState<boolean>(false);
 
@@ -1982,25 +1984,22 @@ export const useGameLogic = () => {
           );
           return { ...prev, knownNPCs: updatedNpcs };
         });
-        setSelectedNPCForChat((prevNpc: NPC | null) =>
-          prevNpc
-            ? {
-                ...prevNpc,
-                dialogueHistory: initialNarrative
-                  ? [
-                      {
-                        id: `sel-npc-initial-${prevNpc.id}-${Date.now()}`,
-                        timestamp: Date.now(),
-                        speaker: prevNpc.name,
-                        narrative: initialNarrative,
-                        type: 'npc_dialogue',
-                      },
-                    ]
-                  : [],
-              }
-            : null
-        );
-        setNpcChatSuggestions(suggestions || null);
+        const npcWithHistory = {
+          ...npcToUpdate,
+          dialogueHistory: initialNarrative
+            ? [
+                {
+                  id: `sel-npc-initial-${npcToUpdate.id}-${Date.now()}`,
+                  timestamp: Date.now(),
+                  speaker: npcToUpdate.name,
+                  narrative: initialNarrative,
+                  type: 'npc_dialogue' as const,
+                },
+              ]
+            : [],
+        };
+        setSelectedNPCForChat(npcWithHistory);
+        setNpcChatSuggestions(suggestions || []);
       };
 
       setNpcChatHistoryAndSelectNpc(
@@ -2054,7 +2053,7 @@ export const useGameLogic = () => {
         );
         return { ...prev, knownNPCs: updatedNpcs };
       });
-      setNpcChatSuggestions(null); // Clear previous suggestions while AI thinks
+      setNpcChatSuggestions([]); // Clear previous suggestions while AI thinks
 
       const npcSystemPrompt = GEMINI_NPC_CHAT_SYSTEM_PROMPT;
 
@@ -2114,7 +2113,7 @@ export const useGameLogic = () => {
             timestamp: Date.now(),
             speaker: currentNpcContext.name,
             narrative: aiResponse.narrative,
-            type: 'npc_dialogue',
+            type: 'npc_dialogue' as const,
           }
         : null;
 
@@ -2139,7 +2138,7 @@ export const useGameLogic = () => {
           return { ...prev, knownNPCs: updatedNpcs };
         });
       }
-      setNpcChatSuggestions(aiResponse.suggestedPlayerReplies || null);
+      setNpcChatSuggestions(aiResponse.suggestedPlayerReplies || []);
       updateGameState(prev => ({
         ...prev,
         aiLoadingStatus: { status: 'idle' } as LoadingStatus,
@@ -2159,15 +2158,17 @@ export const useGameLogic = () => {
   }, [updateGameState]);
 
   // Auto-save game state to localStorage when it changes
-  useEffect(() => {
-    // Only save if the game has progressed beyond initial customization
-    if (
-      gameState.gameMode !== GameMode.CUSTOMIZE_RANDOM_START ||
-      gameState.initialProfileGenerated
-    ) {
-      saveGameState(gameState);
-    }
-  }, [gameState]);
+  // useEffect(() => {
+  //   // TODO: Implement a new auto-save strategy for multi-slot system.
+  //   // This might involve saving to the most recent slot, or a designated auto-save slot.
+  //   // For now, auto-save is disabled to prevent conflicts with manual saving.
+  //   // if (
+  //   //   gameState.gameMode !== GameMode.CUSTOMIZE_RANDOM_START ||
+  //   //   gameState.initialProfileGenerated
+  //   // ) {
+  //   //   saveGameState(gameState);
+  //   // }
+  // }, [gameState]);
 
   // Set initial load flag after component mounts
   useEffect(() => {
@@ -2178,43 +2179,41 @@ export const useGameLogic = () => {
     return () => clearTimeout(timer);
   }, []);
 
-  // Function to load saved game state
-  const loadSavedGameState = useCallback(() => {
-    const savedState = loadGameState();
+  const loadGame = useCallback(async (slotId: number) => {
+    setIsLoadingFromSave(true);
+    const savedState = await loadGameState(slotId);
     if (savedState) {
-      setIsLoadingFromSave(true); // Set flag to prevent auto-generation
-
-      // Update state in a single atomic operation
       setGameState(savedState);
-
-      // Set appropriate static segment based on loaded state
-      if (savedState.gameMode === GameMode.ADVENTURE) {
-        setCurrentStaticSegmentId('AI_ADVENTURE_HANDOFF');
-      } else if (savedState.gameMode === GameMode.BATTLE) {
-        setCurrentStaticSegmentId('BATTLE_MODE');
-      } else if (savedState.initialProfileGenerated) {
-        setCurrentStaticSegmentId('CUSTOMIZED_START_READY');
-      }
-
-      // Clear the flag after state has stabilized
-      setTimeout(() => {
-        setIsLoadingFromSave(false);
-      }, 500); // Increased delay to ensure complete stability
+    } else {
+      console.error(`Failed to load game from slot ${slotId}`);
+      // Optionally, handle the error in the UI
     }
-    setHasAttemptedInitialLoad(true); // Mark that we've attempted initial load
+    setIsLoadingFromSave(false);
   }, []);
 
   // Function to start fresh game (clear saved state)
-  const startFreshGame = useCallback(() => {
-    clearSavedGameState();
-    setIsLoadingFromSave(false); // Clear the flag
-    setGameState(INITIAL_GAME_STATE);
-    setCurrentStaticSegmentId('INITIAL_PROFILE_PREPARATION');
-    setHasAttemptedInitialLoad(true); // Mark that we've attempted initial load
+  // This effect runs once on mount to check for saved games.
+  useEffect(() => {
+    const checkForSaves = async () => {
+      const saves = await getSavedGames();
+      setSavedGames(saves);
+      if (saves.length > 0) {
+        // If saves exist, we stay in MAIN_MENU mode, waiting for user action.
+        setGameState(prev => ({ ...prev, gameMode: GameMode.MAIN_MENU }));
+      } else {
+        // No saves, proceed to character creation.
+        setGameState(prev => ({ ...prev, gameMode: GameMode.CUSTOMIZE_RANDOM_START }));
+      }
+      setIsLoadingFromSave(false);
+    };
+    checkForSaves();
   }, []);
 
   return {
     gameState,
+    savedGames,
+    isLoadingFromSave,
+    loadGame,
     currentStaticSegmentId,
     advanceStaticStory,
     handleStaticStoryChoice,
@@ -2229,14 +2228,12 @@ export const useGameLogic = () => {
     handleStartAdventureWithCustomizedProfile,
     handleDirectCustomizationUpdate,
     handleSendCustomizationAssistantMessage,
-    requestDynamicTimeSuggestion, // Export new function
+    requestDynamicTimeSuggestion,
     handleSavePlayerProfileChanges,
     handleRegeneratePokemonImage,
     fetchInitialNPCDialogueAndOrSuggestions,
     handleSendPlayerMessageToNPC,
     npcInteractionLoading,
     clearCustomizationAssistantResponse,
-    loadSavedGameState,
-    startFreshGame,
   };
 };

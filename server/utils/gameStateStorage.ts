@@ -1,103 +1,128 @@
-import { GameState } from '../types';
+import { GameState, GameSave, SaveSlot } from '../types';
 
-const GAME_STATE_KEY = 'anime-pokemon-game-state';
-const GAME_STATE_VERSION = '1.0.0';
-
-interface StoredGameData {
-  version: string;
-  timestamp: number;
-  gameState: GameState;
-}
+const GAME_SAVES_KEY = 'game_saves';
+const CURRENT_VERSION = '1.0.0';
 
 /**
- * 保存游戏状态到localStorage
+ * Retrieves the entire GameSave object from localStorage.
+ * @returns The parsed GameSave object or a default structure if not found or invalid.
  */
-export const saveGameState = (gameState: GameState): boolean => {
+const getGameSave = async (): Promise<GameSave> => {
   try {
-    const dataToStore: StoredGameData = {
-      version: GAME_STATE_VERSION,
-      timestamp: Date.now(),
-      gameState: gameState,
-    };
+    const storedData = localStorage.getItem(GAME_SAVES_KEY);
+    if (storedData) {
+      const parsedData: GameSave = JSON.parse(storedData);
+      if (parsedData.version === CURRENT_VERSION) {
+        return parsedData;
+      }
+      console.warn('Game save version mismatch, ignoring saved data.');
+    }
+  } catch (error) {
+    console.error('Failed to load or parse game saves:', error);
+  }
+  // Return a default structure if no valid data is found
+  return { version: CURRENT_VERSION, saveSlots: [] };
+};
 
-    localStorage.setItem(GAME_STATE_KEY, JSON.stringify(dataToStore));
-    return true;
+/**
+ * Saves the entire GameSave object to localStorage.
+ * @param gameSave The GameSave object to be stored.
+ */
+const setGameSave = async (gameSave: GameSave): Promise<void> => {
+  try {
+    const dataToStore = JSON.stringify(gameSave);
+    localStorage.setItem(GAME_SAVES_KEY, dataToStore);
   } catch (error) {
     console.error('Failed to save game state:', error);
-    return false;
+    throw new Error('Failed to save game state due to a serialization error.');
   }
 };
 
 /**
- * 从localStorage加载游戏状态
+ * Returns a list of save slots without the full game state for performance.
+ * @returns A promise that resolves to an array of SaveSlot objects (without gameState).
  */
-export const loadGameState = (): GameState | null => {
+export const getSavedGames = async (): Promise<Omit<SaveSlot, 'gameState'>[]> => {
+  const gameSave = await getGameSave();
+  return gameSave.saveSlots.map(({ slotId, timestamp }) => ({
+    slotId,
+    timestamp,
+  }));
+};
+
+/**
+ * Saves a game state to a specific slot.
+ * @param slotId The ID of the slot to save to.
+ * @param gameState The game state to save.
+ * @returns A promise that resolves when the save is complete.
+ */
+export const saveGameState = async (
+  slotId: number,
+  gameState: GameState
+): Promise<void> => {
+  const gameSave = await getGameSave();
+  const newSaveSlot: SaveSlot = {
+    slotId,
+    timestamp: Date.now(),
+    gameState,
+  };
+
+  const existingSlotIndex = gameSave.saveSlots.findIndex(
+    (slot) => slot.slotId === slotId
+  );
+
+  if (existingSlotIndex > -1) {
+    // Overwrite existing slot
+    gameSave.saveSlots[existingSlotIndex] = newSaveSlot;
+  } else {
+    // Add new slot
+    gameSave.saveSlots.push(newSaveSlot);
+  }
+
+  await setGameSave(gameSave);
+};
+
+/**
+ * Loads a game state from a specific slot.
+ * @param slotId The ID of the slot to load from.
+ * @returns A promise that resolves to the GameState or null if not found.
+ */
+export const loadGameState = async (slotId: number): Promise<GameState | null> => {
+  const gameSave = await getGameSave();
+  const saveSlot = gameSave.saveSlots.find((slot) => slot.slotId === slotId);
+  return saveSlot ? saveSlot.gameState : null;
+};
+
+/**
+ * Deletes a game state from a specific slot.
+ * @param slotId The ID of the slot to delete.
+ * @returns A promise that resolves when the deletion is complete.
+ */
+export const deleteGameState = async (slotId: number): Promise<void> => {
   try {
-    const storedData = localStorage.getItem(GAME_STATE_KEY);
+    const storedData = localStorage.getItem(GAME_SAVES_KEY);
     if (!storedData) {
-      return null;
+      return; // No save file, nothing to delete
+    }
+    
+    const gameSave: GameSave = JSON.parse(storedData);
+
+    // Only proceed if version matches
+    if (gameSave.version !== CURRENT_VERSION) {
+        return;
     }
 
-    const parsed: StoredGameData = JSON.parse(storedData);
+    const initialCount = gameSave.saveSlots.length;
+    gameSave.saveSlots = gameSave.saveSlots.filter(
+      (slot) => slot.slotId !== slotId
+    );
 
-    // 检查版本兼容性
-    if (parsed.version !== GAME_STATE_VERSION) {
-      console.warn('Game state version mismatch, ignoring saved data');
-      clearSavedGameState();
-      return null;
+    // Only write back if a change was made
+    if (gameSave.saveSlots.length < initialCount) {
+      await setGameSave(gameSave);
     }
-
-    return parsed.gameState;
   } catch (error) {
-    console.error('Failed to load game state:', error);
-    clearSavedGameState();
-    return null;
-  }
-};
-
-/**
- * 检查是否有保存的游戏状态
- */
-export const hasSavedGameState = (): boolean => {
-  try {
-    const storedData = localStorage.getItem(GAME_STATE_KEY);
-    if (!storedData) {
-      return false;
-    }
-
-    const parsed: StoredGameData = JSON.parse(storedData);
-    return parsed.version === GAME_STATE_VERSION && !!parsed.gameState;
-  } catch (error) {
-    console.error('Failed to check saved game state:', error);
-    return false;
-  }
-};
-
-/**
- * 清除保存的游戏状态
- */
-export const clearSavedGameState = (): void => {
-  try {
-    localStorage.removeItem(GAME_STATE_KEY);
-  } catch (error) {
-    console.error('Failed to clear saved game state:', error);
-  }
-};
-
-/**
- * 获取保存游戏状态的时间戳
- */
-export const getSavedGameTimestamp = (): number | null => {
-  try {
-    const storedData = localStorage.getItem(GAME_STATE_KEY);
-    if (!storedData) {
-      return null;
-    }
-
-    const parsed: StoredGameData = JSON.parse(storedData);
-    return parsed.timestamp;
-  } catch (error) {
-    console.error('Failed to get saved game timestamp:', error);
-    return null;
+    // If data is malformed, do nothing as per test expectations.
+    console.error('Failed to process deletion, data might be malformed:', error);
   }
 };

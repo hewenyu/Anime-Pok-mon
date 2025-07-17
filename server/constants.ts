@@ -316,7 +316,7 @@ export const INITIAL_GAME_STATE: GameState = {
     },
   ],
   money: 0,
-  gameMode: GameMode.CUSTOMIZE_RANDOM_START,
+  gameMode: GameMode.MAIN_MENU,
   currentGameTime: new Date().getTime(), // Default to current time, will be set by user input, AI, or fallback
   aiSuggestedGameStartTime: undefined, // Store AI's suggestion for full profile
   currentAIScene: null,

@@ -163,7 +163,7 @@ export interface PokemonMoveInstance {
   currentPP: number;
   description?: string;
   effects?: MoveEffect[]; // New field for detailed move effects
-  accuracy?: number; // Move accuracy (0-100, or null for always-hit)
+  accuracy?: number | null; // Move accuracy (0-100, or null for always-hit)
   priority?: number; // Move priority (default 0)
 }
 
@@ -207,6 +207,7 @@ export enum BattleGameStatus {
 }
 
 export enum GameMode {
+  MAIN_MENU = 'MAIN_MENU',
   CUSTOMIZE_RANDOM_START = 'CUSTOMIZE_RANDOM_START',
   ADVENTURE = 'ADVENTURE',
   BATTLE = 'BATTLE',
@@ -529,4 +530,22 @@ export interface BattleCommandParseContext {
   enemyPokemon: Pokemon | undefined;
   playerTeam: Pokemon[];
   inventory: InventoryItem[];
+}
+
+
+/**
+ * Represents a single save slot containing the full game state.
+ */
+export interface SaveSlot {
+  slotId: number;
+  timestamp: number;
+  gameState: GameState;
+}
+
+/**
+ * The top-level object stored in localStorage, containing all save slots.
+ */
+export interface GameSave {
+  version: string;
+  saveSlots: SaveSlot[];
 }
