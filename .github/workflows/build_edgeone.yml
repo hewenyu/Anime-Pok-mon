@@ -34,6 +34,10 @@ jobs:
     
     - name: Build project (ensure code compiles)
       working-directory: ./server
+      env:
+        GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
+        GOOGLE_GEMINI_BASE_URL: ${{ secrets.GOOGLE_GEMINI_BASE_URL }} 
+        GEMINI_MODEL: ${{ secrets.GEMINI_MODEL }}
       run: npm run build
 
     - name: Deploy to EdgeOne
