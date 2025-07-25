@@ -37,4 +37,5 @@ jobs:
       run: npm run build
 
     - name: Deploy to EdgeOne
+      working-directory: ./server
       run: edgeone pages deploy ./dist -n anime-pok-mon -t ${{ secrets.EDGEONE_TOKEN }}
