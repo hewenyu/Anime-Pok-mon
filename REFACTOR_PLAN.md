@@ -121,26 +121,40 @@ UI 分为顶层视图、模态框、面板和原子组件。当前主要问题�
     -   `AdventurePage`
     -   `BattlePage`
 
-## 7. 实施计划 (TODO List)
+## 7. 实施计划与当前进度
 
-- [ ] **1. 初始化项目**: 使用 Vite 创建一个新的 React + TypeScript 项目。
-- [ ] **2. 安装核心依赖**: 安装 `zustand`, `react-router-dom`, `@tanstack/react-query`, `react-hook-form`。
-- [ ] **3. 配置 Shadcn/ui**: 初始化 Shadcn/ui，并配置 `tailwind.config.js`。
-- [ ] **4. 搭建状态管理 (Zustand)**:
-    - [ ] 创建 `store` 目录。
-    - [ ] 将原 `GameState` 拆分为 `playerSlice`, `storySlice`, `battleSlice` 等模块。
+### 阶段一：项目初始化与环境配置 (进行中)
+
+- [x] **1. 初始化项目**: 使用 Vite 在 `refactored-client` 目录下创建了一个新的 React + TypeScript 项目。
+- [x] **2. 安装核心依赖**: 成功安装了 `zustand`, `react-router-dom`, `@tanstack/react-query`, `react-hook-form`。
+- [x] **3. 配置 Shadcn/ui**:
+    - [x] 安装了 `tailwindcss` 和 `@tailwindcss/vite`。
+    - [x] 配置了 `vite.config.ts` 和 `tsconfig.json` 以支持 Tailwind CSS 和路径别名。
+    - [x] 成功运行 `npx shadcn@latest init` 完成了 Shadcn/ui 的初始化。
+- [-] **4. 搭建状态管理 (Zustand)**:
+    - [ ] 创建 `store` 目录。 (已完成)
+    - [ ] 将原 `GameState` 拆分为 `playerSlice`, `storySlice`, `battleSlice` 等模块。 (正在进行 `playerSlice`)
     - [ ] 实现每个 slice 的 state 和 actions。
+
+### 阶段二：核心功能重构 (待开始)
+
 - [ ] **5. 设置路由 (React Router)**:
     - [ ] 在 `App.tsx` 中配置路由，替代原有的 `switch` 逻辑。
     - [ ] 创建 `/`, `/customize`, `/adventure`, `/battle` 等路由。
 - [ ] **6. 迁移核心逻辑**:
     - [ ] 将原 `use...Manager` 中的逻辑迁移到 Zustand store 的 actions 中。
     - [ ] 使用 TanStack Query 封装 `geminiService.ts` 中的所有 API 请求。
+
+### 阶段三：UI 重构与开发 (待开始)
+
 - [ ] **7. 逐个重构 UI 组件 (遵循原子设计)**:
     - [ ] **Atoms & Molecules**: 从最底层的原子和分子组件开始，使用 Shadcn/ui 重建。
     - [ ] **Organisms**: 组合原子和分子，构建更复杂的模块。
     - [ ] **Templates & Pages**: 搭建页面布局，并连接 Zustand store 获取数据和调用 actions。
     - [ ] 使用 React Hook Form 重构所有表单。
+
+### 阶段四：完善与测试 (待开始)
+
 - [ ] **8. 完善与测试**:
     - [ ] 编写单元测试 (Vitest) 和组件测试 (React Testing Library)。
     - [ ] 进行全面的功能回归测试。
