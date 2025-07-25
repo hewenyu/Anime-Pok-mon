@@ -15,6 +15,7 @@ import {
   PokemonType,
   ClassifiedIntent,
   ActiveStatusCondition,
+  MoveEffect,
 } from '../types';
 import {
   GEMINI_GAME_MASTER_SYSTEM_PROMPT,
@@ -31,7 +32,7 @@ const API_KEY = process.env.API_KEY;
 const GEMINI_MODEL = process.env.GEMINI_MODEL || 'gemini-2.5-flash';
 
 if (!API_KEY) {
-  console.error(
+  throw new Error(
     'API_KEY is not set. Please ensure the API_KEY environment variable is configured.'
   );
 }
@@ -383,7 +384,7 @@ async function fetchStoryContinuationInternal(
         }
       );
 
-      rawTrimmedText = response.text.trim();
+      rawTrimmedText = (response.text ?? '').trim();
     }
     jsonText = rawTrimmedText;
 
@@ -394,11 +395,11 @@ async function fetchStoryContinuationInternal(
     }
 
     try {
-      const parsedData: any = JSON.parse(jsonText);
+      const parsedData: Partial<AIStoryResponse> = JSON.parse(jsonText);
 
       const typedEvents = Array.isArray(parsedData.events)
         ? (parsedData.events
-            .map((event: any) => {
+            .map((event: Partial<AIEventTrigger>) => {
               if (event.type === 'SET_PLAYER_PROFILE' && event.profileDetails) {
                 return {
                   ...event,
@@ -420,7 +421,9 @@ async function fetchStoryContinuationInternal(
                   Array.isArray(aiProvidedPokemonData.moves)
                 ) {
                   sanitizedMovesArray = aiProvidedPokemonData.moves.map(
-                    (move: any): PokemonMoveInstance => {
+                    (
+                      move: Partial<PokemonMoveInstance>
+                    ): PokemonMoveInstance => {
                       let category: '物理' | '特殊' | '变化';
                       if (
                         move.category &&
@@ -475,7 +478,7 @@ async function fetchStoryContinuationInternal(
                             ? move.description
                             : undefined,
                         effects: Array.isArray(move.effects)
-                          ? move.effects.map(eff => ({
+                          ? move.effects.map((eff: MoveEffect) => ({
                               ...eff,
                               effectString:
                                 eff.effectString || '该效果没有额外说明',
@@ -516,11 +519,11 @@ async function fetchStoryContinuationInternal(
       let finalChoices: AIStoryChoice[] | undefined = undefined;
       if (Array.isArray(parsedData.choices)) {
         const filteredChoices = parsedData.choices.filter(
-          (c: any) =>
+          (c: Partial<AIStoryChoice>) =>
             c && typeof c.text === 'string' && typeof c.actionTag === 'string'
         );
         if (filteredChoices.length > 0) {
-          finalChoices = filteredChoices.map(c => ({
+          finalChoices = filteredChoices.map((c: AIStoryChoice) => ({
             ...c,
             text: c.text || '继续',
           })) as AIStoryChoice[];
@@ -530,14 +533,16 @@ async function fetchStoryContinuationInternal(
       let finalSuggestedPlayerReplies: AIStoryChoice[] | undefined = undefined;
       if (Array.isArray(parsedData.suggestedPlayerReplies)) {
         const filteredReplies = parsedData.suggestedPlayerReplies.filter(
-          (r: any) =>
+          (r: Partial<AIStoryChoice>) =>
             r && typeof r.text === 'string' && typeof r.actionTag === 'string'
         );
         if (filteredReplies.length > 0) {
-          finalSuggestedPlayerReplies = filteredReplies.map(r => ({
-            ...r,
-            text: r.text || '好的',
-          })) as AIStoryChoice[];
+          finalSuggestedPlayerReplies = filteredReplies.map(
+            (r: AIStoryChoice) => ({
+              ...r,
+              text: r.text || '好的',
+            })
+          ) as AIStoryChoice[];
         }
       }
 
@@ -750,15 +755,7 @@ async function fetchStoryContinuationInternal(
         }
       }
       return aiResponse;
-    } catch (parseError) {
-      console.error('Failed to parse JSON response from AI:', parseError);
-      console.error('Text attempted for parsing:', jsonText);
-      if (jsonText !== rawTrimmedText)
-        console.error(
-          'Original raw text from AI (before fence removal):',
-          rawTrimmedText
-        );
-
+    } catch {
       if (retryCount < MAX_RETRIES) {
         if (onRetry) {
           onRetry(retryCount + 1, MAX_RETRIES + 1, 'format');
@@ -788,7 +785,6 @@ async function fetchStoryContinuationInternal(
       }
     }
   } catch (apiError) {
-    console.error('Error fetching story from Gemini:', apiError);
     let errorMessage = '连接AI时遇到了一个问题。';
     if (apiError instanceof Error)
       errorMessage += ` 错误信息: ${apiError.message}`;
@@ -808,7 +804,6 @@ export async function classifyCustomizationIntent(
   retryCount = 0
 ): Promise<ClassifiedIntent | null> {
   if (!API_KEY) {
-    console.error('API_KEY not available for intent classification.');
     return {
       intent: 'UNKNOWN_INTENT',
       originalQuery: userInput,
@@ -840,7 +835,7 @@ export async function classifyCustomizationIntent(
         thinkingConfig: { thinkingBudget: 0 },
       },
     });
-    jsonText = response.text.trim();
+    jsonText = (response.text ?? '').trim();
     const fenceRegex = /^```(\w*)?\s*\n?(.*?)\n?\s*```$/s;
     const match = jsonText.match(fenceRegex);
     if (match && match[2]) {
@@ -855,9 +850,7 @@ export async function classifyCustomizationIntent(
     }
     if (!parsed.originalQuery) parsed.originalQuery = userInput; // Ensure originalQuery is always populated
     return parsed;
-  } catch (e) {
-    console.error('Error classifying customization intent with AI:', e);
-    console.error('Text attempted for parsing (Intent Classifier):', jsonText);
+  } catch {
     if (retryCount < MAX_RETRIES) {
       if (onRetry) onRetry(retryCount + 1, MAX_RETRIES + 1, 'format');
       await new Promise(resolve => setTimeout(resolve, 500 + retryCount * 250));
@@ -903,9 +896,8 @@ export async function fetchMoveDescription(
         thinkingConfig: { thinkingBudget: 0 },
       },
     });
-    return response.text.trim() || 'AI未能生成描述。';
-  } catch (error) {
-    console.error(`Error fetching description for move ${moveName}:`, error);
+    return (response.text ?? '').trim() || 'AI未能生成描述。';
+  } catch {
     return '获取招式描述时发生错误。';
   }
 }
@@ -1022,7 +1014,7 @@ async function parsePlayerBattleCommandInternal(
         }
       );
 
-      rawTrimmedText = response.text.trim();
+      rawTrimmedText = (response.text ?? '').trim();
     }
     jsonText = rawTrimmedText;
 
@@ -1041,10 +1033,6 @@ async function parsePlayerBattleCommandInternal(
       parsedData.feedbackMessage &&
       !/[\u4e00-\u9fa5]/.test(parsedData.feedbackMessage)
     ) {
-      console.warn(
-        'AI feedbackMessage might not be in Chinese:',
-        parsedData.feedbackMessage
-      );
       parsedData.feedbackMessage = '处理指令时发生未知错误。';
     }
     if (
@@ -1056,17 +1044,11 @@ async function parsePlayerBattleCommandInternal(
         m => m.name === parsedData.moveName
       );
       if (moveInstance && moveInstance.currentPP > 0) {
-        console.warn(
-          `AI reported NOT_ENOUGH_PP for ${parsedData.moveName} but it has ${moveInstance.currentPP}/${moveInstance.basePP} PP. Overriding to USE_MOVE.`
-        );
         return { actionType: 'USE_MOVE', moveName: parsedData.moveName };
       }
     }
     return parsedData;
-  } catch (e) {
-    console.error('Error parsing battle command with AI:', e);
-    console.error('AI Raw Response (if available):', rawTrimmedText || 'N/A');
-    console.error('Attempted JSON for parsing:', jsonText);
+  } catch {
     if (retryCount < MAX_RETRIES) {
       if (onRetry) {
         onRetry(retryCount + 1, MAX_RETRIES + 1, 'format');
@@ -1230,7 +1212,7 @@ Please provide item action suggestions based on this context.
         }
       );
 
-      rawTrimmedText = response.text.trim();
+      rawTrimmedText = (response.text ?? '').trim();
     }
     jsonText = rawTrimmedText;
     const fenceRegex = /^```(\w*)?\s*\n?(.*?)\n?\s*```$/s;
@@ -1256,10 +1238,7 @@ Please provide item action suggestions based on this context.
     );
 
     return parsedData;
-  } catch (e) {
-    console.error('Error fetching battle item action suggestions from AI:', e);
-    console.error('AI Raw Response (Item Suggester):', rawTrimmedText || 'N/A');
-    console.error('Attempted JSON for parsing (Item Suggester):', jsonText);
+  } catch {
     if (retryCount < MAX_RETRIES) {
       if (onRetry) {
         onRetry(retryCount + 1, MAX_RETRIES + 1, 'format');
