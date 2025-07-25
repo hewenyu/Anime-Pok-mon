@@ -10,6 +10,12 @@ on:
     paths:
       - 'server/**'
 
+# set env variable for building
+env:
+  GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
+  GOOGLE_GEMINI_BASE_URL: ${{ secrets.GOOGLE_GEMINI_BASE_URL }}
+  GEMINI_MODEL: ${{ secrets.GEMINI_MODEL }}
+
 jobs:
   build-edgeone:
     runs-on: ubuntu-latest
