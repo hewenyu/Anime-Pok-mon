@@ -1,6 +1,6 @@
-name: Lint and Code Quality Check
-
+name: Build EdgeOne
 on:
+  workflow_dispatch:
   pull_request:
     branches: [ main ]
     paths:
@@ -11,32 +11,30 @@ on:
       - 'server/**'
 
 jobs:
-  lint-and-check:
+  build-edgeone:
     runs-on: ubuntu-latest
-    
+    environment: edgeone
     steps:
     - name: Checkout code
       uses: actions/checkout@v4
-      
+
     - name: Setup Node.js
       uses: actions/setup-node@v4
       with:
         node-version: '20'
         cache: 'npm'
         cache-dependency-path: 'server/package-lock.json'
-        
+    
     - name: Install dependencies
       working-directory: ./server
       run: npm ci
-      
-    - name: Run ESLint
-      working-directory: ./server
-      run: npm run lint
-      
-    - name: Check Prettier formatting
-      working-directory: ./server
-      run: npm run format:check
-      
+
+    - name: Install EdgeOne CLI
+      run: npm install -g edgeone
+    
     - name: Build project (ensure code compiles)
       working-directory: ./server
       run: npm run build
+
+    - name: Deploy to EdgeOne
+      run: edgeone pages deploy ./dist -n project-name -t ${{ secrets.EDGEONE_TOKEN }}
