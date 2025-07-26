@@ -1,13 +1,25 @@
 import { create } from 'zustand';
 
-export type GameMode = 'MainMenu' | 'InGame' | 'Paused';
+export type GameState = 'MainMenu' | 'InGame' | 'Paused';
 
-type GameState = {
-  gameMode: GameMode;
-  setGameMode: (mode: GameMode) => void;
+export type GameStoreState = {
+  gameState: GameState;
+  setGameState: (state: GameState) => void;
+  location: string;
+  objective: string;
+  areaMap: string;
+  gameTime: string;
 };
 
-export const useGameStore = create<GameState>((set) => ({
-  gameMode: 'MainMenu',
-  setGameMode: (mode) => set({ gameMode: mode }),
+export const useGameStore = create<GameStoreState>((set) => ({
+  gameState: 'MainMenu',
+  setGameState: (state) => set({ gameState: state }),
+  location: 'Unknown',
+  objective: 'Find your purpose.',
+  areaMap: `
+    ? ? ?
+    ? ? ?
+    ? ? ?
+  `,
+  gameTime: 'Day 1, 00:00 AM',
 }));

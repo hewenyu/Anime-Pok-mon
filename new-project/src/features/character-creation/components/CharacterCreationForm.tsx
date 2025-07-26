@@ -1,4 +1,6 @@
 import React, { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
+import { useCharacterStore } from '../../../store/characterStore';
 
 // Define the shape of the form data
 interface CharacterFormData {
@@ -8,12 +10,10 @@ interface CharacterFormData {
   description: string;
 }
 
-// Define the props for the component
-interface CharacterCreationFormProps {
-  onSubmit: (data: CharacterFormData) => void;
-}
+const CharacterCreationForm: React.FC = () => {
+  const navigate = useNavigate();
+  const setProfile = useCharacterStore((state) => state.setProfile);
 
-const CharacterCreationForm: React.FC<CharacterCreationFormProps> = ({ onSubmit }) => {
   const [formData, setFormData] = useState<CharacterFormData>({
     name: '',
     gender: '男',
@@ -33,7 +33,27 @@ const CharacterCreationForm: React.FC<CharacterCreationFormProps> = ({ onSubmit 
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    onSubmit(formData);
+    if (formData.name.trim() === '') {
+      alert('角色名称不能为空！');
+      return;
+    }
+
+    // Map form gender to store gender
+    const genderMap = {
+      '男': 'Male',
+      '女': 'Female',
+      '其他': 'Other',
+    } as const;
+
+    setProfile({
+      name: formData.name,
+      age: formData.age,
+      gender: genderMap[formData.gender],
+      description: formData.description,
+    });
+    
+    // Navigation is handled by the parent screen
+    navigate('/');
   };
 
   return (
@@ -92,7 +112,7 @@ const CharacterCreationForm: React.FC<CharacterCreationFormProps> = ({ onSubmit 
         type="submit"
         className="w-full flex justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
       >
-        开始冒险
+        创建角色
       </button>
     </form>
   );

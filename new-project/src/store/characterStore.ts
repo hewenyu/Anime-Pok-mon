@@ -3,26 +3,51 @@ import { create } from 'zustand';
 // Define the shape of the character's profile
 export type Profile = {
   name: string;
-  gender: '男' | '女' | '其他';
+  gender: 'Male' | 'Female' | 'Other';
   age: number;
   description: string;
 };
 
-type CharacterState = {
-  profile: Profile;
-  level: number;
-  setProfile: (profile: Profile) => void;
-  levelUp: () => void;
+export type Stats = {
+  stamina: number;
+  maxStamina: number;
+  energy: number;
+  maxEnergy: number;
 };
 
-export const useCharacterStore = create<CharacterState>((set) => ({
+// A simplified Pokemon type for now
+export type Pokemon = {
+  id: string;
+  name: string;
+  level: number;
+  // other details...
+};
+
+export type CharacterStoreState = {
+  profile: Profile;
+  stats: Stats;
+  healthStatus: string;
+  money: number;
+  team: Pokemon[];
+  setProfile: (profile: Profile) => void;
+  // other actions can be added here
+};
+
+export const useCharacterStore = create<CharacterStoreState>((set) => ({
   profile: {
-    name: '',
-    gender: '男',
+    name: 'Player',
     age: 18,
-    description: '',
+    gender: 'Other',
+    description: 'A new adventurer.',
   },
-  level: 1,
+  stats: {
+    stamina: 100,
+    maxStamina: 100,
+    energy: 100,
+    maxEnergy: 100,
+  },
+  healthStatus: 'Healthy',
+  money: 1000,
+  team: [],
   setProfile: (profile) => set({ profile }),
-  levelUp: () => set((state) => ({ level: state.level + 1 })),
 }));
