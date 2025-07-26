@@ -2,9 +2,6 @@ import { render, screen, fireEvent } from '@testing-library/react';
 import '@testing-library/jest-dom';
 import { vi } from 'vitest';
 import PlayerInfoPanel from './PlayerInfoPanel';
-import { useCharacterStore } from '../../../store/characterStore';
-import { useGameStore } from '../../../store/gameStore';
-import { useUIStore } from '../../../store/uiStore';
 
 const mockOpenModal = vi.fn();
 
@@ -68,16 +65,21 @@ describe('PlayerInfoPanel', () => {
 
   it('renders health status and money', () => {
     render(<PlayerInfoPanel />);
-    expect(screen.getByText(/Status: Healthy/)).toBeInTheDocument();
-    expect(screen.getByText(/Money: \$500/)).toBeInTheDocument();
+    expect(screen.getByText('Status:')).toBeInTheDocument();
+    expect(screen.getByText('Healthy')).toBeInTheDocument();
+    expect(screen.getByText('Money:')).toBeInTheDocument();
+    expect(screen.getByText('$500')).toBeInTheDocument();
   });
 
   it('renders game information', () => {
     render(<PlayerInfoPanel />);
     expect(screen.getByText(/Time: Day 1, 09:00 AM/)).toBeInTheDocument();
-    expect(screen.getByText(/Location: Pallet Town/)).toBeInTheDocument();
-    expect(screen.getByText(/Objective: Become a Pokemon Master/)).toBeInTheDocument();
-    expect(screen.getByText(/# P {3}#/)).toBeInTheDocument();
+    expect(screen.getByText('Location:')).toBeInTheDocument();
+    expect(screen.getByText('Pallet Town')).toBeInTheDocument();
+    expect(screen.getByText('Objective:')).toBeInTheDocument();
+    expect(screen.getByText('Become a Pokemon Master')).toBeInTheDocument();
+    const mapElement = screen.getByText(/# P/);
+    expect(mapElement.textContent).toContain('# P   #');
   });
 
   it('renders action buttons', () => {

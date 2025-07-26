@@ -32,14 +32,16 @@ describe('CharacterCreationScreen', () => {
     vi.clearAllMocks();
 
     // Provide mock implementation for the stores using vi.mocked
-    mockedUseCharacterStore.mockReturnValue({
+    mockedUseCharacterStore.mockImplementation(() => ({
       setProfile: mockSetProfile,
-      // The rest of the store is not needed for this test
-      profile: { id: 0, name: '', gender: '男', age: 0, description: '' },
-      level: 1,
-      createCharacter: vi.fn(),
-      levelUp: vi.fn(),
-    });
+      profile: { name: '', gender: '男', age: 18, description: '' },
+      stats: { stamina: 100, maxStamina: 100, energy: 100, maxEnergy: 100 },
+      healthStatus: 'Healthy',
+      money: 1000,
+      team: [],
+      inventory: [],
+      getPokemonByInstanceId: vi.fn(),
+    }));
     mockedUseGameStore.mockReturnValue({
       setGameState: mockSetGameState,
     });
@@ -57,7 +59,7 @@ describe('CharacterCreationScreen', () => {
     const ageInput = screen.getByLabelText(/年龄/i);
     const genderSelect = screen.getByLabelText(/性别/i);
     const descriptionTextarea = screen.getByLabelText(/描述/i);
-    const submitButton = screen.getByRole('button', { name: /开始冒险/i });
+    const submitButton = screen.getByRole('button', { name: /创建角色/i });
 
     // 2. Simulate user input
     fireEvent.change(nameInput, { target: { value: '勇者' } });
@@ -91,7 +93,7 @@ describe('CharacterCreationScreen', () => {
       </MemoryRouter>
     );
 
-    const submitButton = screen.getByRole('button', { name: /开始冒险/i });
+    const submitButton = screen.getByRole('button', { name: /创建角色/i });
 
     // Simulate form submission with empty required fields
     fireEvent.click(submitButton);

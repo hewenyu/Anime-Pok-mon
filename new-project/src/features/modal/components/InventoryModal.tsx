@@ -94,6 +94,12 @@ const ItemsPanel: React.FC<{ items: InventoryItem[] }> = ({ items }) => {
 };
 
 const PokemonPanel: React.FC<{ pokemonTeam: Pokemon[] }> = ({ pokemonTeam }) => {
+  const { openModal } = useUIStore();
+
+  const handlePokemonClick = (pokemonInstanceId: string) => {
+    openModal('pokemonDetail', { pokemonInstanceId });
+  };
+
   if (pokemonTeam.length === 0) {
     return <p>队伍中没有宝可梦。</p>;
   }
@@ -101,7 +107,9 @@ const PokemonPanel: React.FC<{ pokemonTeam: Pokemon[] }> = ({ pokemonTeam }) => 
   return (
     <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
       {pokemonTeam.map((pokemon) => (
-        <PokemonCard key={pokemon.id} pokemon={pokemon} variant="compact" />
+        <div key={pokemon.instanceId} onClick={() => handlePokemonClick(pokemon.instanceId)} className="cursor-pointer">
+          <PokemonCard pokemon={pokemon} variant="compact" />
+        </div>
       ))}
     </div>
   );

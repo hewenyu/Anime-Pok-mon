@@ -46,7 +46,9 @@ describe('InventoryModal', () => {
       setProfile: vi.fn(),
     });
     mockUseUiStore.mockReturnValue({
-      modalId: 'inventory',
+      isModalOpen: true,
+      modalType: 'inventory',
+      modalPayload: null,
       openModal: vi.fn(),
       closeModal: closeModal,
     });
