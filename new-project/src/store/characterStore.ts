@@ -1,4 +1,5 @@
 import { create } from 'zustand';
+import type { Pokemon } from '../types';
 
 // Define the shape of the character's profile
 export type Profile = {
@@ -15,13 +16,7 @@ export type Stats = {
   maxEnergy: number;
 };
 
-// A simplified Pokemon type for now
-export type Pokemon = {
-  id: string;
-  name: string;
-  level: number;
-  // other details...
-};
+import type { InventoryItem } from '../types';
 
 export type CharacterStoreState = {
   profile: Profile;
@@ -29,6 +24,7 @@ export type CharacterStoreState = {
   healthStatus: string;
   money: number;
   team: Pokemon[];
+  inventory: InventoryItem[];
   setProfile: (profile: Profile) => void;
   // other actions can be added here
 };
@@ -49,5 +45,6 @@ export const useCharacterStore = create<CharacterStoreState>((set) => ({
   healthStatus: 'Healthy',
   money: 1000,
   team: [],
+  inventory: [],
   setProfile: (profile) => set({ profile }),
 }));

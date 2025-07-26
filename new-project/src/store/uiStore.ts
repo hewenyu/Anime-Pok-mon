@@ -1,6 +1,6 @@
 import { create } from 'zustand';
 
-type ModalType = 'editProfile' | 'worldMap' | 'inventory' | 'pokemonDetail' | 'saveGame';
+export type ModalType = 'editProfile' | 'worldMap' | 'inventory' | 'pokemonDetail' | 'saveGame';
 
 interface ModalPayload {
   pokemonId?: string;
