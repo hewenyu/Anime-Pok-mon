@@ -26,10 +26,10 @@ export type CharacterStoreState = {
   team: Pokemon[];
   inventory: InventoryItem[];
   setProfile: (profile: Profile) => void;
-  // other actions can be added here
+  getPokemonByInstanceId: (instanceId: string) => Pokemon | undefined;
 };
 
-export const useCharacterStore = create<CharacterStoreState>((set) => ({
+export const useCharacterStore = create<CharacterStoreState>((set, get) => ({
   profile: {
     name: 'Player',
     age: 18,
@@ -47,4 +47,8 @@ export const useCharacterStore = create<CharacterStoreState>((set) => ({
   team: [],
   inventory: [],
   setProfile: (profile) => set({ profile }),
+  getPokemonByInstanceId: (instanceId: string): Pokemon | undefined => {
+    const { team } = get();
+    return team.find((p) => p.instanceId === instanceId);
+  },
 }));

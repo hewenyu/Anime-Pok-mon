@@ -4,6 +4,7 @@ export type ModalType = 'editProfile' | 'worldMap' | 'inventory' | 'pokemonDetai
 
 interface ModalPayload {
   pokemonId?: string;
+  pokemonInstanceId?: string;
 }
 
 interface UIState {

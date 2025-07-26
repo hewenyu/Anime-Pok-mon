@@ -21,8 +21,8 @@ const mockItems: InventoryItem[] = [
 ];
 
 const mockPokemonTeam: Pokemon[] = [
-  { id: 'p1', name: '皮卡丘', level: 12, currentHp: 35, maxHp: 35, types: [], imageUrl: '', moves: [] },
-  { id: 'p2', name: '小火龙', level: 10, currentHp: 30, maxHp: 30, types: [], imageUrl: '', moves: [] },
+  { instanceId: 'uuid-p1', id: 'p1', name: '皮卡丘', level: 12, currentHp: 35, maxHp: 35, types: [], imageUrl: '', moves: [] },
+  { instanceId: 'uuid-p2', id: 'p2', name: '小火龙', level: 10, currentHp: 30, maxHp: 30, types: [], imageUrl: '', moves: [] },
 ];
 
 describe('InventoryModal', () => {

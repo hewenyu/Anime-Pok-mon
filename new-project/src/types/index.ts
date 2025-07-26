@@ -46,6 +46,7 @@ export interface PokemonMoveInstance {
 }
 
 export interface Pokemon {
+  instanceId: string;
   id: string;
   name: string;
   types: PokemonType[];
