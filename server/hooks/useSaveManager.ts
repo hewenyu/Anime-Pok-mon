@@ -23,7 +23,14 @@ export const useSaveManager = (
       setIsLoadingFromSave(true);
       const savedState = await loadGameState(slotId);
       if (savedState) {
-        setGameState(savedState);
+        // Reset transient AI states for backward compatibility with old saves
+        const sanitizedState = {
+          ...savedState,
+          aiLoadingStatus: { status: 'idle' as const },
+          pokemonInstanceIdToRegenerate: undefined,
+          pokemonNameToRegenerate: undefined,
+        };
+        setGameState(sanitizedState);
       } else {
         console.error(`Failed to load game from slot ${slotId}`);
       }
@@ -34,7 +41,14 @@ export const useSaveManager = (
 
   const saveGame = useCallback(
     async (slotId: number) => {
-      await saveGameState(slotId, gameState);
+      // Create a clean version of the game state that excludes transient AI states
+      const stateToSave = {
+        ...gameState,
+        aiLoadingStatus: { status: 'idle' as const },
+        pokemonInstanceIdToRegenerate: undefined,
+        pokemonNameToRegenerate: undefined,
+      };
+      await saveGameState(slotId, stateToSave);
       const saves = await getSavedGames();
       setSavedGames(saves);
     },
