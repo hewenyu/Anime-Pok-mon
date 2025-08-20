@@ -28,7 +28,7 @@ import {
   GEMINI_BATTLE_ITEM_ACTION_SUGGESTOR_SYSTEM_PROMPT, // Added for item suggestions
 } from '../constants';
 
-const API_KEY = process.env.API_KEY || 'dummy-key-for-development';
+const API_KEY = process.env.API_KEY;
 const GEMINI_MODEL = process.env.GEMINI_MODEL || 'gemini-2.5-flash';
 
 if (!API_KEY) {
@@ -38,8 +38,7 @@ if (!API_KEY) {
 }
 
 if (!process.env.GOOGLE_GEMINI_BASE_URL) {
-  console.warn('GOOGLE_GEMINI_BASE_URL environment variable not set, using default');
-  process.env.GOOGLE_GEMINI_BASE_URL = 'https://generativelanguage.googleapis.com';
+  throw new Error('GOOGLE_GEMINI_BASE_URL environment variable not set');
 }
 
 const httpOptions = {
