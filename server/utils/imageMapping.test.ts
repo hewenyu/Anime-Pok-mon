@@ -70,7 +70,7 @@ describe('imageMapping', () => {
     });
 
     it('should return original URL for unavailable Pokemon', () => {
-      const externalUrl = 'https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/500.png';
+      const externalUrl = 'https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/2000.png';
       expect(convertPokemonUrlToLocal(externalUrl)).toBe(externalUrl);
     });
   });
@@ -94,7 +94,7 @@ describe('imageMapping', () => {
     });
 
     it('should use external URL for unknown Pokemon with external URL provided', () => {
-      const externalUrl = 'https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/500.png';
+      const externalUrl = 'https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/2000.png';
       const result = getBestPokemonImageUrl('未知宝可梦', externalUrl);
       expect(result).toBe(externalUrl);
     });

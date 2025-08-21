@@ -42,13 +42,13 @@ describe('dataSanitizers with image caching', () => {
         maxHp: 60,
         currentHp: 60,
         types: ['普通'],
-        imageUrl: 'https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/999.png',
+        imageUrl: 'https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/2000.png',
       };
 
       const result = sanitizePokemonData(inputPokemon);
       
       expect(result.name).toBe('未知宝可梦');
-      expect(result.imageUrl).toBe('https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/999.png');
+      expect(result.imageUrl).toBe('https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/2000.png');
     });
 
     it('should fallback to placeholder for Pokemon without external URL', () => {
