@@ -95,8 +95,8 @@ const PokemonDetailModal: React.FC<PokemonDetailModalProps> = ({
           ...prev,
           [moveName]: { isLoading: false, description: description },
         }));
-      } catch (error) {
-        console.error('Failed to fetch move description:', error);
+      } catch (_error) {
+        // Failed to fetch move description - provide fallback
         setMoveDescriptionCache(prev => ({
           ...prev,
           [moveName]: { isLoading: false, description: '无法获取招式描述。' },

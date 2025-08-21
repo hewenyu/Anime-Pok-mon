@@ -47,8 +47,8 @@ const SaveGameModal: React.FC<SaveGameModalProps> = ({
       await saveGameState(selectedSlot, currentGameState);
       onSaveSuccess();
       onClose();
-    } catch (error) {
-      console.error('保存失败:', error);
+    } catch (_error) {
+      // Show user-friendly error message
       alert('保存游戏失败！');
     }
   };

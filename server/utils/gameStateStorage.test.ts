@@ -66,8 +66,16 @@ describe('gameStateStorage', () => {
       const savedGames = await getSavedGames();
 
       expect(savedGames).toHaveLength(2);
-      expect(savedGames[0]).toEqual({ slotId: 1, timestamp: timestamp1 });
-      expect(savedGames[1]).toEqual({ slotId: 2, timestamp: timestamp2 });
+      expect(savedGames[0]).toEqual({
+        slotId: 1,
+        timestamp: timestamp1,
+        playerProfile: gameState1.playerProfile,
+      });
+      expect(savedGames[1]).toEqual({
+        slotId: 2,
+        timestamp: timestamp2,
+        playerProfile: gameState2.playerProfile,
+      });
       // Ensure gameState is not part of the returned data for this function
       expect(savedGames[0]).not.toHaveProperty('gameState');
     });

@@ -108,9 +108,9 @@ const App: React.FC = () => {
         suggestionActionTag
       );
     } else {
-      console.error(
-        'NPC context mismatch or no NPC selected for sending message.'
-      );
+      // NPC context mismatch or no NPC selected - this is a developer error
+      // but should not crash the app in production
+      return;
     }
   };
 

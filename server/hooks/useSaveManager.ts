@@ -25,7 +25,7 @@ export const useSaveManager = (
       if (savedState) {
         setGameState(savedState);
       } else {
-        console.error(`Failed to load game from slot ${slotId}`);
+        // Failed to load game - silently continue with default state
       }
       setIsLoadingFromSave(false);
     },

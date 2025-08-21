@@ -15,10 +15,10 @@ const getGameSave = async (): Promise<GameSave> => {
       if (parsedData.version === CURRENT_VERSION) {
         return parsedData;
       }
-      console.warn('Game save version mismatch, ignoring saved data.');
+      // Game save version mismatch, ignoring saved data
     }
-  } catch (error) {
-    console.error('Failed to load or parse game saves:', error);
+  } catch (_error) {
+    // Failed to load or parse game saves - return default structure
   }
   // Return a default structure if no valid data is found
   return { version: CURRENT_VERSION, saveSlots: [] };
@@ -32,8 +32,8 @@ const setGameSave = async (gameSave: GameSave): Promise<void> => {
   try {
     const dataToStore = JSON.stringify(gameSave);
     localStorage.setItem(GAME_SAVES_KEY, dataToStore);
-  } catch (error) {
-    console.error('Failed to save game state:', error);
+  } catch (_error) {
+    // Failed to save game state due to serialization error
     throw new Error('Failed to save game state due to a serialization error.');
   }
 };
@@ -126,11 +126,8 @@ export const deleteGameState = async (slotId: number): Promise<void> => {
     if (gameSave.saveSlots.length < initialCount) {
       await setGameSave(gameSave);
     }
-  } catch (error) {
+  } catch (_error) {
     // If data is malformed, do nothing as per test expectations.
-    console.error(
-      'Failed to process deletion, data might be malformed:',
-      error
-    );
+    // Failed to process deletion, data might be malformed
   }
 };

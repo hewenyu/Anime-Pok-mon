@@ -176,18 +176,7 @@ const BattleView: React.FC<BattleViewProps> = ({
 
   useEffect(() => {
     // Log current PPs when returning to main menu, to help debug PP issues
-    if (
-      currentScreen === 'MAIN_MENU' &&
-      activePlayerPokemon &&
-      !isProcessingTurn
-    ) {
-      console.log(
-        `[BattleView PP Check] ${activePlayerPokemon.name}'s moves after turn:`
-      );
-      activePlayerPokemon.moves.forEach(move => {
-        console.log(`  - ${move.name}: ${move.currentPP}/${move.basePP} PP`);
-      });
-    }
+    // Debug information is available in the UI through the battle log
   }, [currentScreen, activePlayerPokemon, isProcessingTurn]);
 
   const updatePokemonState = useCallback(
@@ -350,14 +339,9 @@ const BattleView: React.FC<BattleViewProps> = ({
   ) => {
     const parts = choice.actionTag.split(':');
     if (parts.length === 3 && parts[0] === 'USE_ITEM_ON_TARGET') {
-      const itemNameFromTag = parts[1];
       const targetId = parts[2];
 
-      if (itemUsed.name !== itemNameFromTag) {
-        console.warn(
-          `Item name mismatch in suggestion: expected ${itemUsed.name}, got ${itemNameFromTag}. Using ${itemUsed.name}.`
-        );
-      }
+      // Item name validation is handled internally
 
       addBattleLogEntry(
         `${playerProfileName || '你'}决定 ${choice.text}`,

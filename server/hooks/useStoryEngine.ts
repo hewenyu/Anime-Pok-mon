@@ -377,9 +377,7 @@ export const useStoryEngine = (
           setTimeout(() => advanceStaticStory(newSegment.nextSegmentId!), 50);
         }
       } else {
-        console.error(
-          `Static story segment "${segmentId}" not found. Attempting AI recovery.`
-        );
+        // Static story segment not found - attempt AI recovery
         updateGameState(prev => {
           const errorEntry: ChatHistoryEntry = {
             id: `${Date.now()}-error`,
@@ -792,10 +790,7 @@ export const useStoryEngine = (
           pokemonNameToRegenerate: pokemonToRegen.name,
         });
       } else {
-        console.warn(
-          'Could not find Pokémon with instanceId for image regeneration:',
-          instanceId
-        );
+        // Could not find Pokémon for image regeneration - update state with error message
         updateGameState(prev => ({
           ...prev,
           chatHistory: [
