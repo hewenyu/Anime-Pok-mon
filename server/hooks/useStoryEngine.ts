@@ -377,6 +377,7 @@ export const useStoryEngine = (
           setTimeout(() => advanceStaticStory(newSegment.nextSegmentId!), 50);
         }
       } else {
+        // eslint-disable-next-line no-console
         console.error(
           `Static story segment "${segmentId}" not found. Attempting AI recovery.`
         );
@@ -504,7 +505,7 @@ export const useStoryEngine = (
 
       triggerAIStory(choice.actionTag);
     },
-    [gameState, updateGameState, triggerAIStory, startBattle]
+    [updateGameState, triggerAIStory, startBattle]
   );
 
   const handlePlayerCustomInputAction = useCallback(
@@ -792,6 +793,7 @@ export const useStoryEngine = (
           pokemonNameToRegenerate: pokemonToRegen.name,
         });
       } else {
+        // eslint-disable-next-line no-console
         console.warn(
           'Could not find Pokémon with instanceId for image regeneration:',
           instanceId

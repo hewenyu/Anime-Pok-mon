@@ -159,6 +159,7 @@ describe('gameStateStorage', () => {
 
     it('should handle errors during stringification gracefully', async () => {
       const circularState = {} as GameState;
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       const obj: any = {};
       obj.a = { b: obj };
       circularState.playerProfile = obj; // create circular reference

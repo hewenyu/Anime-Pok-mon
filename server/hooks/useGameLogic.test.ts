@@ -14,7 +14,9 @@ vi.mock('../utils/gameStateStorage', () => ({
   deleteGameState: vi.fn(),
 }));
 
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 const mockGetSavedGames = gameStateStorage.getSavedGames as any;
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 const mockLoadGameState = gameStateStorage.loadGameState as any;
 
 describe('useGameLogic Hook with Save/Load Logic', () => {

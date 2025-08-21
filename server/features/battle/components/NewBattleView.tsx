@@ -47,7 +47,7 @@ const NewBattleView: React.FC<NewBattleViewProps> = ({
     commandParseLoadingStatus,
     playerInput,
     itemSubActionLoading,
-    
+
     // Actions
     initializeBattle,
     setCurrentScreen,
@@ -55,7 +55,7 @@ const NewBattleView: React.FC<NewBattleViewProps> = ({
     setActivePlayerPokemon,
     addBattleLogEntry,
     setPlayerInput,
-    
+
     // High-level actions
     endBattleAndReturnToAdventure,
   } = useBattleFeature();
@@ -68,7 +68,7 @@ const NewBattleView: React.FC<NewBattleViewProps> = ({
       initialEnemyPokemon,
       initialPlayerPokemonInstanceId
     );
-    
+
     // Add initial battle message
     addBattleLogEntry(
       `${playerProfileName || '玩家'} 遇到了野生的 ${initialEnemyPokemon.name}！`,
@@ -90,9 +90,9 @@ const NewBattleView: React.FC<NewBattleViewProps> = ({
 
     if (!activePlayerPokemon || activePlayerPokemon.isFainted) {
       const nextAvailablePokemon = playerTeam.find(
-        (p) => p.instanceId !== activePlayerPokemon?.instanceId && !p.isFainted
+        p => p.instanceId !== activePlayerPokemon?.instanceId && !p.isFainted
       );
-      
+
       if (nextAvailablePokemon) {
         addBattleLogEntry(
           `${activePlayerPokemon?.name || '宝可梦'}倒下了！请选择下一只宝可梦。`
@@ -135,10 +135,14 @@ const NewBattleView: React.FC<NewBattleViewProps> = ({
 
   const handlePlayerInputSubmit = useCallback(() => {
     if (!playerInput.trim()) return;
-    
+
     // Echo the player's input
-    addBattleLogEntry(playerInput, playerProfileName || '玩家', 'player_command_echo');
-    
+    addBattleLogEntry(
+      playerInput,
+      playerProfileName || '玩家',
+      'player_command_echo'
+    );
+
     // Simple demo logic - this would be replaced with actual battle command parsing
     if (playerInput.toLowerCase().includes('逃跑')) {
       addBattleLogEntry('你成功逃跑了！');
@@ -147,9 +151,16 @@ const NewBattleView: React.FC<NewBattleViewProps> = ({
     } else {
       addBattleLogEntry(`收到指令: ${playerInput}`, '系统');
     }
-    
+
     setPlayerInput('');
-  }, [playerInput, addBattleLogEntry, playerProfileName, setPlayerInput, setBattleOutcome, setCurrentScreen]);
+  }, [
+    playerInput,
+    addBattleLogEntry,
+    playerProfileName,
+    setPlayerInput,
+    setBattleOutcome,
+    setCurrentScreen,
+  ]);
 
   const renderScreenContent = () => {
     if (currentScreen === 'BATTLE_OVER_CHOICES') {
@@ -181,7 +192,7 @@ const NewBattleView: React.FC<NewBattleViewProps> = ({
                   pokemonWasCaught || undefined,
                   battleLog
                 );
-                
+
                 // Also call the original callback for compatibility
                 onBattleEnd(
                   battleOutcome === 'win',
@@ -208,21 +219,30 @@ const NewBattleView: React.FC<NewBattleViewProps> = ({
             当前屏幕: {currentScreen}
           </p>
           <p className="text-xs text-gray-500">
-            简化战斗演示 - 输入"逃跑"来结束战斗
+            简化战斗演示 - 输入&quot;逃跑&quot;来结束战斗
           </p>
         </div>
-        
+
         {activePlayerPokemon && (
           <div className="text-sm space-y-1">
-            <p><strong>你的宝可梦:</strong> {activePlayerPokemon.name}</p>
-            <p><strong>HP:</strong> {activePlayerPokemon.currentHp}/{activePlayerPokemon.maxHp}</p>
+            <p>
+              <strong>你的宝可梦:</strong> {activePlayerPokemon.name}
+            </p>
+            <p>
+              <strong>HP:</strong> {activePlayerPokemon.currentHp}/
+              {activePlayerPokemon.maxHp}
+            </p>
           </div>
         )}
-        
+
         {enemyPokemon && (
           <div className="text-sm space-y-1 mt-2">
-            <p><strong>敌方宝可梦:</strong> {enemyPokemon.name}</p>
-            <p><strong>HP:</strong> {enemyPokemon.currentHp}/{enemyPokemon.maxHp}</p>
+            <p>
+              <strong>敌方宝可梦:</strong> {enemyPokemon.name}
+            </p>
+            <p>
+              <strong>HP:</strong> {enemyPokemon.currentHp}/{enemyPokemon.maxHp}
+            </p>
           </div>
         )}
       </div>

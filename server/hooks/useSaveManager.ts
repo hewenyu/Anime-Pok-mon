@@ -25,6 +25,7 @@ export const useSaveManager = (
       if (savedState) {
         setGameState(savedState);
       } else {
+        // eslint-disable-next-line no-console
         console.error(`Failed to load game from slot ${slotId}`);
       }
       setIsLoadingFromSave(false);
@@ -51,16 +52,22 @@ export const useSaveManager = (
     const saves = await getSavedGames();
     setSavedGames(saves);
     if (saves.length > 0) {
-      setGameState({ ...gameState, gameMode: GameMode.MAIN_MENU });
+      setGameState(prevState => ({
+        ...prevState,
+        gameMode: GameMode.MAIN_MENU,
+      }));
     } else {
-      setGameState({ ...gameState, gameMode: GameMode.CUSTOMIZE_RANDOM_START });
+      setGameState(prevState => ({
+        ...prevState,
+        gameMode: GameMode.CUSTOMIZE_RANDOM_START,
+      }));
     }
     setIsLoadingFromSave(false);
   }, [setGameState]);
 
   useEffect(() => {
     checkForSavedGamesOnMount();
-  }, []);
+  }, [checkForSavedGamesOnMount]);
 
   return {
     savedGames,

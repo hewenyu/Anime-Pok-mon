@@ -176,6 +176,7 @@ export const useGameLogic = () => {
     saveManager.isLoadingFromSave,
     hasAttemptedInitialLoad,
     storyEngine.triggerAIStory,
+    storyEngine,
   ]);
 
   return {

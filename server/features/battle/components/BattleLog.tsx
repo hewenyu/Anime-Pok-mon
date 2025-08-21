@@ -22,7 +22,7 @@ const BattleLog: React.FC<BattleLogProps> = ({ battleLog, className = '' }) => {
       className={`battle-panel-base p-2 custom-scrollbar overflow-y-auto ${className}`}
     >
       <div className="space-y-1.5">
-        {battleLog.map((msg) =>
+        {battleLog.map(msg =>
           msg.text === ' ' && msg.speaker === '分隔符' ? (
             <hr key={msg.id} className="battle-log-separator my-1.5" />
           ) : (
@@ -55,7 +55,7 @@ const BattleLog: React.FC<BattleLogProps> = ({ battleLog, className = '' }) => {
                         className="battle-action-button-small text-xs py-1 px-2"
                         onClick={() => {
                           // This would need to be handled by the parent component
-                          console.log('Item suggestion clicked:', suggestion);
+                          // Debug: Item suggestion clicked: ${suggestion.text}
                         }}
                       >
                         {suggestion.text}

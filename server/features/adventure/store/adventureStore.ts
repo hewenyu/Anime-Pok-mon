@@ -1,18 +1,18 @@
 import { create } from 'zustand';
-import { ChatHistoryEntry, AIScene, NPC, AreaMap } from '../../../types';
+import { ChatHistoryEntry, AIStoryResponse, NPC } from '../../../types';
 
 interface AdventureState {
   // Story and narrative
   currentLocationDescription: string;
   currentObjective: string;
-  currentAIScene: AIScene | null;
-  currentAreaMap: AreaMap | null;
-  globalAreaMap: Record<string, AreaMap>;
+  currentAIScene: AIStoryResponse | null;
+  currentAreaMap: string | null;
+  globalAreaMap: Record<string, string>;
   chatHistory: ChatHistoryEntry[];
-  
+
   // NPCs and relationships
   knownNPCs: NPC[];
-  
+
   // Current segment tracking
   currentStaticSegmentId: string;
   npcInteractionLoading: boolean;
@@ -22,25 +22,27 @@ interface AdventureActions {
   // Location and map
   setCurrentLocation: (description: string) => void;
   setCurrentObjective: (objective: string) => void;
-  setCurrentAreaMap: (map: AreaMap | null) => void;
-  updateGlobalAreaMap: (locationKey: string, map: AreaMap) => void;
-  
+  setCurrentAreaMap: (map: string | null) => void;
+  updateGlobalAreaMap: (locationKey: string, map: string) => void;
+
   // AI Scene
-  setCurrentAIScene: (scene: AIScene | null) => void;
-  
+  setCurrentAIScene: (scene: AIStoryResponse | null) => void;
+
   // Chat history
   addChatHistoryEntry: (entry: ChatHistoryEntry) => void;
-  updateChatHistory: (updater: (history: ChatHistoryEntry[]) => ChatHistoryEntry[]) => void;
+  updateChatHistory: (
+    updater: (history: ChatHistoryEntry[]) => ChatHistoryEntry[]
+  ) => void;
   clearChatHistory: () => void;
-  
+
   // NPCs
   addKnownNPC: (npc: NPC) => void;
   updateNPCRelationship: (npcId: string, relationshipStatus: string) => void;
-  
+
   // Static story navigation
   setCurrentStaticSegmentId: (id: string) => void;
   setNpcInteractionLoading: (loading: boolean) => void;
-  
+
   // Reset
   resetAdventure: () => void;
 }
@@ -57,45 +59,54 @@ const initialAdventureState: AdventureState = {
   npcInteractionLoading: false,
 };
 
-export const useAdventureStore = create<AdventureState & AdventureActions>((set, get) => ({
-  ...initialAdventureState,
+export const useAdventureStore = create<AdventureState & AdventureActions>(
+  (set, _get) => ({
+    ...initialAdventureState,
 
-  setCurrentLocation: (description) => set({ currentLocationDescription: description }),
-  setCurrentObjective: (objective) => set({ currentObjective: objective }),
-  setCurrentAreaMap: (map) => set({ currentAreaMap: map }),
-  
-  updateGlobalAreaMap: (locationKey, map) => set((state) => ({
-    globalAreaMap: { ...state.globalAreaMap, [locationKey]: map }
-  })),
+    setCurrentLocation: description =>
+      set({ currentLocationDescription: description }),
+    setCurrentObjective: objective => set({ currentObjective: objective }),
+    setCurrentAreaMap: map => set({ currentAreaMap: map }),
 
-  setCurrentAIScene: (scene) => set({ currentAIScene: scene }),
+    updateGlobalAreaMap: (locationKey, map) =>
+      set(state => ({
+        globalAreaMap: { ...state.globalAreaMap, [locationKey]: map },
+      })),
 
-  addChatHistoryEntry: (entry) => set((state) => ({
-    chatHistory: [...state.chatHistory, entry]
-  })),
+    setCurrentAIScene: scene => set({ currentAIScene: scene }),
 
-  updateChatHistory: (updater) => set((state) => ({
-    chatHistory: updater(state.chatHistory)
-  })),
+    addChatHistoryEntry: entry =>
+      set(state => ({
+        chatHistory: [...state.chatHistory, entry],
+      })),
 
-  clearChatHistory: () => set({ chatHistory: [] }),
+    updateChatHistory: updater =>
+      set(state => ({
+        chatHistory: updater(state.chatHistory),
+      })),
 
-  addKnownNPC: (npc) => set((state) => {
-    const existingNPC = state.knownNPCs.find(n => n.id === npc.id);
-    if (existingNPC) {
-      return state; // Don't add duplicates
-    }
-    return { knownNPCs: [...state.knownNPCs, npc] };
-  }),
+    clearChatHistory: () => set({ chatHistory: [] }),
 
-  updateNPCRelationship: (npcId, relationshipStatus) => set((state) => ({
-    knownNPCs: state.knownNPCs.map(npc =>
-      npc.id === npcId ? { ...npc, relationshipStatus } : npc
-    )
-  })),
+    addKnownNPC: npc =>
+      set(state => {
+        const existingNPC = state.knownNPCs.find(n => n.id === npc.id);
+        if (existingNPC) {
+          return state; // Don't add duplicates
+        }
+        return { knownNPCs: [...state.knownNPCs, npc] };
+      }),
 
-  setCurrentStaticSegmentId: (id) => set({ currentStaticSegmentId: id }),
-  setNpcInteractionLoading: (loading) => set({ npcInteractionLoading: loading }),
+    updateNPCRelationship: (npcId, relationshipStatus) =>
+      set(state => ({
+        knownNPCs: state.knownNPCs.map(npc =>
+          npc.id === npcId ? { ...npc, relationshipStatus } : npc
+        ),
+      })),
 
-  resetAdventure: () => set(initialAdventureState),
-}));
+    setCurrentStaticSegmentId: id => set({ currentStaticSegmentId: id }),
+    setNpcInteractionLoading: loading =>
+      set({ npcInteractionLoading: loading }),
+
+    resetAdventure: () => set(initialAdventureState),
+  })
+);

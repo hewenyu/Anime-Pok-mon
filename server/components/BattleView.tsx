@@ -181,12 +181,11 @@ const BattleView: React.FC<BattleViewProps> = ({
       activePlayerPokemon &&
       !isProcessingTurn
     ) {
-      console.log(
-        `[BattleView PP Check] ${activePlayerPokemon.name}'s moves after turn:`
-      );
-      activePlayerPokemon.moves.forEach(move => {
-        console.log(`  - ${move.name}: ${move.currentPP}/${move.basePP} PP`);
-      });
+      // Debug PP check - removed console.log statements for lint compliance
+      // console.log(`[BattleView PP Check] ${activePlayerPokemon.name}'s moves after turn:`);
+      // activePlayerPokemon.moves.forEach(move => {
+      //   console.log(`  - ${move.name}: ${move.currentPP}/${move.basePP} PP`);
+      // });
     }
   }, [currentScreen, activePlayerPokemon, isProcessingTurn]);
 
@@ -354,9 +353,7 @@ const BattleView: React.FC<BattleViewProps> = ({
       const targetId = parts[2];
 
       if (itemUsed.name !== itemNameFromTag) {
-        console.warn(
-          `Item name mismatch in suggestion: expected ${itemUsed.name}, got ${itemNameFromTag}. Using ${itemUsed.name}.`
-        );
+        // Item name mismatch warning: expected ${itemUsed.name}, got ${itemNameFromTag}. Using ${itemUsed.name}.
       }
 
       addBattleLogEntry(
