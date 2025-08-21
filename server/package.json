@@ -17,7 +17,8 @@
     "@google/genai": "0.15.0",
     "react": "^19.1.0",
     "react-dom": "^19.1.0",
-    "tailwindcss": "^3.4.17"
+    "tailwindcss": "^3.4.17",
+    "zustand": "^5.0.8"
   },
   "devDependencies": {
     "@testing-library/react": "^16.3.0",
