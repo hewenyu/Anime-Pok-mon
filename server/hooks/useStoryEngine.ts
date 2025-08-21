@@ -505,7 +505,7 @@ export const useStoryEngine = (
 
       triggerAIStory(choice.actionTag);
     },
-    [gameState, updateGameState, triggerAIStory, startBattle]
+    [updateGameState, triggerAIStory, startBattle]
   );
 
   const handlePlayerCustomInputAction = useCallback(

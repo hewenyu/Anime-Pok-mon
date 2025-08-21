@@ -57,11 +57,11 @@ export const useSaveManager = (
       setGameState({ ...gameState, gameMode: GameMode.CUSTOMIZE_RANDOM_START });
     }
     setIsLoadingFromSave(false);
-  }, [setGameState]);
+  }, [setGameState, gameState]);
 
   useEffect(() => {
     checkForSavedGamesOnMount();
-  }, []);
+  }, [checkForSavedGamesOnMount]);
 
   return {
     savedGames,

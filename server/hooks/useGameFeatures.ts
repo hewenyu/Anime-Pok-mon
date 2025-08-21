@@ -2,7 +2,7 @@ import { useGameStore } from '../store/gameStore';
 import { useBattleStore } from '../features/battle';
 import { useAdventureStore } from '../features/adventure';
 import { useCharacterStore } from '../features/character';
-import { GameMode } from '../types';
+import { GameMode, Pokemon, InventoryItem, BattleChatMessage } from '../types';
 
 /**
  * Composite hook that demonstrates the new feature-based architecture.
@@ -28,9 +28,9 @@ export const useGameFeatures = () => {
   };
 
   const startBattle = (
-    enemyPokemon: any,
-    playerTeam: any[],
-    inventory: any[],
+    enemyPokemon: Pokemon,
+    playerTeam: Pokemon[],
+    inventory: InventoryItem[],
     activePlayerPokemonId: string
   ) => {
     setGameMode(GameMode.BATTLE);
@@ -44,8 +44,8 @@ export const useGameFeatures = () => {
 
   const endBattle = (
     _didPlayerWin: boolean,
-    finalPlayerTeam: any[],
-    finalInventory: any[],
+    finalPlayerTeam: Pokemon[],
+    finalInventory: InventoryItem[],
     _usedRun: boolean
   ) => {
     // Update character state with battle results
@@ -103,12 +103,12 @@ export const useBattleFeature = () => {
 
   const endBattleAndReturnToAdventure = (
     _didPlayerWin: boolean,
-    _finalPlayerTeam: any[],
-    _finalInventory: any[],
-    _finalEnemyPokemon: any,
+    _finalPlayerTeam: Pokemon[],
+    _finalInventory: InventoryItem[],
+    _finalEnemyPokemon: Pokemon,
     _usedRun: boolean,
-    _caughtPokemon?: any,
-    _battleLog?: any[]
+    _caughtPokemon?: Pokemon,
+    _battleLog?: BattleChatMessage[]
   ) => {
     // Here you would typically update character store with results
     // and handle any post-battle logic

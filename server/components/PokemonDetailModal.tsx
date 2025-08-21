@@ -78,7 +78,7 @@ const PokemonDetailModal: React.FC<PokemonDetailModalProps> = ({
         // Optionally clear cache: setMoveDescriptionCache({});
       }
     }
-  }, [pokemon?.instanceId, isOpen, expandedMoveName, pokemon?.moves]);
+  }, [pokemon?.instanceId, isOpen, expandedMoveName, pokemon?.moves, pokemon]);
 
   const fetchAndCacheMoveDescription = useCallback(
     async (moveName: string, pokemonNameForContext: string) => {
