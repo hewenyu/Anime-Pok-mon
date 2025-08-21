@@ -4,42 +4,39 @@
 
 // Mapping of Chinese Pokemon names to their Pokedex IDs
 const POKEMON_NAME_TO_ID: Record<string, number> = {
-  // Generation 1 starter Pokemon and popular ones
-  妙蛙种子: 1,
-  妙蛙草: 2,
-  妙蛙花: 3,
-  小火龙: 4,
-  火恐龙: 5,
-  喷火龙: 6,
-  杰尼龟: 7,
-  卡咪龟: 8,
-  水箭龟: 9,
-  绿毛虫: 10,
-  铁甲蛹: 11,
-  巴大蝶: 12,
-  独角虫: 13,
-  铁壳蛹: 14,
-  大针蜂: 15,
-  波波: 16,
-  比比鸟: 17,
-  大比鸟: 18,
-  小拉达: 19,
-  拉达: 20,
-  烈雀: 21,
-  大嘴雀: 22,
-  阿柏蛇: 23,
-  阿柏怪: 24,
-  皮卡丘: 25,
-  雷丘: 26,
+  // Generation 1 Pokemon (1-20)
+  妙蛙种子: 1, 妙蛙草: 2, 妙蛙花: 3,
+  小火龙: 4, 火恐龙: 5, 喷火龙: 6,
+  杰尼龟: 7, 卡咪龟: 8, 水箭龟: 9,
+  绿毛虫: 10, 铁甲蛹: 11, 巴大蝶: 12,
+  独角虫: 13, 铁壳蛹: 14, 大针蜂: 15,
+  波波: 16, 比比鸟: 17, 大比鸟: 18,
+  小拉达: 19, 拉达: 20,
+  
+  // Pikachu line and others (25-35)
+  皮卡丘: 25, 雷丘: 26,
+  穿山鼠: 27, 穿山王: 28,
+  尼多兰: 29, 尼多娜: 30, 尼多后: 31,
+  尼多朗: 32, 尼多力诺: 33, 尼多王: 34,
+  皮皮: 35,
+  
+  // Popular Pokemon
+  喵喵: 52,
+  耿鬼: 94,
+  卡拉卡拉: 104,
+  吉利蛋: 113,
+  鲤鱼王: 129,
+  百变怪: 132,
+  伊布: 133,
+  水伊布: 134,
+  雷伊布: 135,
+  火伊布: 136,
+  
   // Legendary Pokemon we have images for
-  超梦: 150,
-  梦幻: 151,
-  // Generation 2 starters we have images for
-  菊草叶: 152,
-  月桂叶: 153,
-  大竺葵: 154,
-  火球鼠: 155,
-  // Add more as needed
+  超梦: 150, 梦幻: 151,
+  
+  // Generation 2 starters we have images for  
+  菊草叶: 152, 月桂叶: 153, 大竺葵: 154, 火球鼠: 155,
 };
 
 // Mapping of Chinese item names to their sprite filenames
@@ -114,8 +111,17 @@ export function extractItemFilenameFromUrl(url: string): string | null {
  * Check if a local Pokemon image exists (based on the images we've downloaded)
  */
 export function hasLocalPokemonImage(pokemonId: number): boolean {
-  // Pokemon we have downloaded: 1-10, 25, 150-155
-  const availableIds = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 25, 150, 151, 152, 153, 154, 155];
+  // Pokemon we have downloaded: 1-20, 25-35, plus individual popular ones
+  const availableIds = [
+    // Gen 1 basics: 1-20
+    1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20,
+    // Pikachu line and others: 25-35
+    25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35,
+    // Popular individual Pokemon
+    52, 94, 104, 113, 129, 132, 133, 134, 135, 136,
+    // Legendaries and Gen 2 starters: 150-155
+    150, 151, 152, 153, 154, 155
+  ];
   return availableIds.includes(pokemonId);
 }
 
