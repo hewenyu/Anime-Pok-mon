@@ -58,7 +58,7 @@ const BattleLog: React.FC<BattleLogProps> = ({ battleLog, className = '' }) => {
                           console.log('Item suggestion clicked:', suggestion);
                         }}
                       >
-                        {suggestion.displayText}
+                        {suggestion.text}
                       </ActionButton>
                     ))}
                   </div>
