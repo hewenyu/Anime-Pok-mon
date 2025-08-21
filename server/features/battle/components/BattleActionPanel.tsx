@@ -23,12 +23,12 @@ const BattleActionPanel: React.FC<BattleActionPanelProps> = ({
   onPlayerInputSubmit,
   children,
 }) => {
-  const isInputDisabled = 
+  const isInputDisabled =
     commandParseLoadingStatus.status !== 'idle' ||
     isProcessingTurn ||
     itemSubActionLoading.status !== 'idle';
 
-  const showInputForm = 
+  const showInputForm =
     currentScreen !== 'ACTION_INFO' &&
     currentScreen !== 'BATTLE_OVER_CHOICES' &&
     currentScreen !== 'FORCED_SWITCH';
@@ -45,7 +45,7 @@ const BattleActionPanel: React.FC<BattleActionPanelProps> = ({
           <input
             type="text"
             value={playerInput}
-            onChange={(e) => onPlayerInputChange(e.target.value)}
+            onChange={e => onPlayerInputChange(e.target.value)}
             placeholder="输入战斗指令 (例如: 使用电光一闪)"
             className="input-field flex-grow text-sm"
             disabled={isInputDisabled}

@@ -22,7 +22,7 @@ const BattleLog: React.FC<BattleLogProps> = ({ battleLog, className = '' }) => {
       className={`battle-panel-base p-2 custom-scrollbar overflow-y-auto ${className}`}
     >
       <div className="space-y-1.5">
-        {battleLog.map((msg) =>
+        {battleLog.map(msg =>
           msg.text === ' ' && msg.speaker === '分隔符' ? (
             <hr key={msg.id} className="battle-log-separator my-1.5" />
           ) : (

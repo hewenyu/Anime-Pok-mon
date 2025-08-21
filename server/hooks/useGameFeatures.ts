@@ -11,8 +11,9 @@ import { GameMode } from '../types';
  */
 export const useGameFeatures = () => {
   // Core game state
-  const { gameMode, setGameMode, currentGameTime, advanceGameTime } = useGameStore();
-  
+  const { gameMode, setGameMode, currentGameTime, advanceGameTime } =
+    useGameStore();
+
   // Feature-specific states
   const battleState = useBattleStore();
   const adventureState = useAdventureStore();
@@ -33,24 +34,29 @@ export const useGameFeatures = () => {
     activePlayerPokemonId: string
   ) => {
     setGameMode(GameMode.BATTLE);
-    battleState.initializeBattle(playerTeam, inventory, enemyPokemon, activePlayerPokemonId);
+    battleState.initializeBattle(
+      playerTeam,
+      inventory,
+      enemyPokemon,
+      activePlayerPokemonId
+    );
   };
 
   const endBattle = (
-    didPlayerWin: boolean,
+    _didPlayerWin: boolean,
     finalPlayerTeam: any[],
     finalInventory: any[],
-    usedRun: boolean
+    _usedRun: boolean
   ) => {
     // Update character state with battle results
     characterState.setPlayerTeam(finalPlayerTeam);
     characterState.setInventory(finalInventory);
-    
+
     // Add experience, money, etc. based on battle outcome
-    if (didPlayerWin) {
+    if (_didPlayerWin) {
       characterState.addMoney(100); // Example reward
     }
-    
+
     // Return to adventure mode
     setGameMode(GameMode.ADVENTURE);
     battleState.resetBattle();
@@ -65,12 +71,12 @@ export const useGameFeatures = () => {
     // Game state
     gameMode,
     currentGameTime,
-    
+
     // Feature states (for components that need direct access)
     battle: battleState,
     adventure: adventureState,
     character: characterState,
-    
+
     // High-level actions
     startNewGame,
     startBattle,
@@ -94,19 +100,19 @@ export const useGameState = () => {
 export const useBattleFeature = () => {
   const battleStore = useBattleStore();
   const { setGameMode } = useGameStore();
-  
+
   const endBattleAndReturnToAdventure = (
-    didPlayerWin: boolean,
-    finalPlayerTeam: any[],
-    finalInventory: any[],
-    finalEnemyPokemon: any,
-    usedRun: boolean,
-    caughtPokemon?: any,
-    battleLog?: any[]
+    _didPlayerWin: boolean,
+    _finalPlayerTeam: any[],
+    _finalInventory: any[],
+    _finalEnemyPokemon: any,
+    _usedRun: boolean,
+    _caughtPokemon?: any,
+    _battleLog?: any[]
   ) => {
     // Here you would typically update character store with results
     // and handle any post-battle logic
-    
+
     setGameMode(GameMode.ADVENTURE);
     battleStore.resetBattle();
   };
