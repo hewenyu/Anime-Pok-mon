@@ -48,6 +48,7 @@ const SaveGameModal: React.FC<SaveGameModalProps> = ({
       onSaveSuccess();
       onClose();
     } catch (error) {
+      // eslint-disable-next-line no-console
       console.error('保存失败:', error);
       alert('保存游戏失败！');
     }

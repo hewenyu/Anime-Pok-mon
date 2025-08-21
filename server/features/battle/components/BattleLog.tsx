@@ -55,7 +55,7 @@ const BattleLog: React.FC<BattleLogProps> = ({ battleLog, className = '' }) => {
                         className="battle-action-button-small text-xs py-1 px-2"
                         onClick={() => {
                           // This would need to be handled by the parent component
-                          console.log('Item suggestion clicked:', suggestion);
+                          // Debug: Item suggestion clicked: ${suggestion.text}
                         }}
                       >
                         {suggestion.text}

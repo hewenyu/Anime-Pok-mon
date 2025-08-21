@@ -96,6 +96,7 @@ const PokemonDetailModal: React.FC<PokemonDetailModalProps> = ({
           [moveName]: { isLoading: false, description: description },
         }));
       } catch (error) {
+        // eslint-disable-next-line no-console
         console.error('Failed to fetch move description:', error);
         setMoveDescriptionCache(prev => ({
           ...prev,

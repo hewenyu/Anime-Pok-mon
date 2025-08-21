@@ -25,6 +25,7 @@ export const useSaveManager = (
       if (savedState) {
         setGameState(savedState);
       } else {
+        // eslint-disable-next-line no-console
         console.error(`Failed to load game from slot ${slotId}`);
       }
       setIsLoadingFromSave(false);

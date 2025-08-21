@@ -15,9 +15,11 @@ const getGameSave = async (): Promise<GameSave> => {
       if (parsedData.version === CURRENT_VERSION) {
         return parsedData;
       }
+      // eslint-disable-next-line no-console
       console.warn('Game save version mismatch, ignoring saved data.');
     }
   } catch (error) {
+    // eslint-disable-next-line no-console
     console.error('Failed to load or parse game saves:', error);
   }
   // Return a default structure if no valid data is found
@@ -33,6 +35,7 @@ const setGameSave = async (gameSave: GameSave): Promise<void> => {
     const dataToStore = JSON.stringify(gameSave);
     localStorage.setItem(GAME_SAVES_KEY, dataToStore);
   } catch (error) {
+    // eslint-disable-next-line no-console
     console.error('Failed to save game state:', error);
     throw new Error('Failed to save game state due to a serialization error.');
   }
@@ -128,6 +131,7 @@ export const deleteGameState = async (slotId: number): Promise<void> => {
     }
   } catch (error) {
     // If data is malformed, do nothing as per test expectations.
+    // eslint-disable-next-line no-console
     console.error(
       'Failed to process deletion, data might be malformed:',
       error
