@@ -5,7 +5,7 @@ import {
   AIEventTrigger,
   AICustomizationScreenActionTag,
 } from '../types';
-import { INITIAL_GAME_STATE } from '../constants';
+import { INITIAL_GAME_STATE } from '../constants/gameState';
 import { useSaveManager } from './useSaveManager';
 import { useCharacterManager } from './useCharacterManager';
 import { useStoryEngine } from './useStoryEngine';

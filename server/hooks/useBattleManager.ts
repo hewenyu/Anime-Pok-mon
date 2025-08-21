@@ -9,7 +9,7 @@ import {
   BattleChatMessage,
   AIEventTrigger,
 } from '../types';
-import { STORY_DATA } from '../constants';
+import { STORY_SEGMENTS } from '../constants/storyData';
 import { sanitizePokemonData } from '../utils/dataSanitizers';
 
 type UpdateGameStateFunction = (

@@ -4,7 +4,7 @@ import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { useGameLogic } from './useGameLogic';
 import * as gameStateStorage from '../utils/gameStateStorage';
 import { GameState, GameMode } from '../types';
-import { INITIAL_GAME_STATE } from '../constants';
+import { INITIAL_GAME_STATE } from '../constants/gameState';
 
 // Mock the gameStateStorage module
 vi.mock('../utils/gameStateStorage', () => ({
