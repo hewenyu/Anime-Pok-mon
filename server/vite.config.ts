@@ -17,6 +17,7 @@ export default defineConfig(({ mode }) => {
         env.GOOGLE_GEMINI_BASE_URL
       ),
     },
+    publicDir: 'public',
     resolve: {
       alias: {
         '@': path.resolve(__dirname, '.'),
