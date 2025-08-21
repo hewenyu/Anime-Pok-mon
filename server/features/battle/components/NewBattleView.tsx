@@ -1,6 +1,6 @@
 import React, { useEffect, useCallback } from 'react';
 import { Pokemon, InventoryItem, BattleChatMessage } from '../../../types';
-import { useBattleStore } from '../store/battleStore';
+import { useBattleFeature } from '../../../hooks/useGameFeatures';
 import PokemonBattlefield from '../components/PokemonBattlefield';
 import BattleLog from '../components/BattleLog';
 import BattleActionPanel from '../components/BattleActionPanel';
@@ -32,7 +32,7 @@ const NewBattleView: React.FC<NewBattleViewProps> = ({
   playerProfileName,
   onRegeneratePokemonImage,
 }) => {
-  // Zustand store
+  // Use the new feature-based hook
   const {
     // State
     playerTeam,
@@ -55,7 +55,10 @@ const NewBattleView: React.FC<NewBattleViewProps> = ({
     setActivePlayerPokemon,
     addBattleLogEntry,
     setPlayerInput,
-  } = useBattleStore();
+    
+    // High-level actions
+    endBattleAndReturnToAdventure,
+  } = useBattleFeature();
 
   // Initialize battle on mount
   useEffect(() => {
@@ -65,12 +68,20 @@ const NewBattleView: React.FC<NewBattleViewProps> = ({
       initialEnemyPokemon,
       initialPlayerPokemonInstanceId
     );
+    
+    // Add initial battle message
+    addBattleLogEntry(
+      `${playerProfileName || '玩家'} 遇到了野生的 ${initialEnemyPokemon.name}！`,
+      '系统'
+    );
   }, [
     initializeBattle,
     initialPlayerTeam,
     initialInventory,
     initialEnemyPokemon,
     initialPlayerPokemonInstanceId,
+    addBattleLogEntry,
+    playerProfileName,
   ]);
 
   // Handle active pokemon switching when current one faints
@@ -125,11 +136,20 @@ const NewBattleView: React.FC<NewBattleViewProps> = ({
   const handlePlayerInputSubmit = useCallback(() => {
     if (!playerInput.trim()) return;
     
-    // This would contain the logic from the original handlePlayerInputCommand
-    // For now, just echo the input
+    // Echo the player's input
     addBattleLogEntry(playerInput, playerProfileName || '玩家', 'player_command_echo');
+    
+    // Simple demo logic - this would be replaced with actual battle command parsing
+    if (playerInput.toLowerCase().includes('逃跑')) {
+      addBattleLogEntry('你成功逃跑了！');
+      setBattleOutcome('run');
+      setCurrentScreen('BATTLE_OVER_CHOICES');
+    } else {
+      addBattleLogEntry(`收到指令: ${playerInput}`, '系统');
+    }
+    
     setPlayerInput('');
-  }, [playerInput, addBattleLogEntry, playerProfileName, setPlayerInput]);
+  }, [playerInput, addBattleLogEntry, playerProfileName, setPlayerInput, setBattleOutcome, setCurrentScreen]);
 
   const renderScreenContent = () => {
     if (currentScreen === 'BATTLE_OVER_CHOICES') {
@@ -151,6 +171,18 @@ const NewBattleView: React.FC<NewBattleViewProps> = ({
             className="choice-button primary"
             onClick={() => {
               if (battleOutcome) {
+                // Use the new integrated battle end function
+                endBattleAndReturnToAdventure(
+                  battleOutcome === 'win',
+                  playerTeam,
+                  currentInventory,
+                  enemyPokemon || initialEnemyPokemon,
+                  battleOutcome === 'run',
+                  pokemonWasCaught || undefined,
+                  battleLog
+                );
+                
+                // Also call the original callback for compatibility
                 onBattleEnd(
                   battleOutcome === 'win',
                   playerTeam,
@@ -170,13 +202,29 @@ const NewBattleView: React.FC<NewBattleViewProps> = ({
     }
 
     return (
-      <div className="p-4 text-center">
-        <p className="text-sm text-gray-600">
-          当前屏幕: {currentScreen}
-        </p>
-        <p className="text-xs text-gray-500 mt-2">
-          此版本正在开发中...更多功能即将添加
-        </p>
+      <div className="p-4">
+        <div className="text-center mb-4">
+          <p className="text-sm text-gray-600 mb-2">
+            当前屏幕: {currentScreen}
+          </p>
+          <p className="text-xs text-gray-500">
+            简化战斗演示 - 输入"逃跑"来结束战斗
+          </p>
+        </div>
+        
+        {activePlayerPokemon && (
+          <div className="text-sm space-y-1">
+            <p><strong>你的宝可梦:</strong> {activePlayerPokemon.name}</p>
+            <p><strong>HP:</strong> {activePlayerPokemon.currentHp}/{activePlayerPokemon.maxHp}</p>
+          </div>
+        )}
+        
+        {enemyPokemon && (
+          <div className="text-sm space-y-1 mt-2">
+            <p><strong>敌方宝可梦:</strong> {enemyPokemon.name}</p>
+            <p><strong>HP:</strong> {enemyPokemon.currentHp}/{enemyPokemon.maxHp}</p>
+          </div>
+        )}
       </div>
     );
   };
