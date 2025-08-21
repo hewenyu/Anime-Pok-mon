@@ -9,6 +9,7 @@ import {
   ItemEffect,
   StatusCondition,
 } from '../types';
+import { getBestPokemonImageUrl, getBestItemImageUrl } from './imageMapping';
 
 const isValidPokemonType = (typeStr: string): typeStr is PokemonType => {
   return Object.values(PokemonType).includes(typeStr as PokemonType);
@@ -135,8 +136,10 @@ export const sanitizePokemonData = (aiPokemon: Partial<Pokemon>): Pokemon => {
     level: level,
     currentXp: currentXp,
     xpToNextLevel: xpToNextLevel,
-    imageUrl:
-      aiPokemon.imageUrl || 'https://placehold.co/96x96/322D41/E0D8F0?text=?',
+    imageUrl: getBestPokemonImageUrl(
+      aiPokemon.name || '未知宝可梦',
+      aiPokemon.imageUrl
+    ),
     moves: sanitizedMoves,
     attack: attack,
     defense: defense,
@@ -172,18 +175,7 @@ export const sanitizeItemData = (
   aiItem: Partial<InventoryItem>
 ): InventoryItem => {
   const name = aiItem.name || '未知道具';
-  let imageUrlToUse: string;
-
-  if (
-    aiItem.imageUrl &&
-    (aiItem.imageUrl.startsWith('http://') ||
-      aiItem.imageUrl.startsWith('https://') ||
-      aiItem.imageUrl.startsWith('data:image'))
-  ) {
-    imageUrlToUse = aiItem.imageUrl;
-  } else {
-    imageUrlToUse = `https://placehold.co/48x48/E0D8F0/4A3F66?text=${encodeURIComponent(name.substring(0, 1))}`;
-  }
+  const imageUrlToUse = getBestItemImageUrl(name, aiItem.imageUrl);
 
   let finalDescription: string | undefined = undefined;
   if (typeof aiItem.description === 'string') {
