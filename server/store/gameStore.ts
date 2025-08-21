@@ -1,5 +1,5 @@
 import { create } from 'zustand';
-import { GameState, GameMode, LoadingStatus } from '../types';
+import { GameState, GameMode, LoadingStatus, BattleRecord } from '../types';
 import { INITIAL_GAME_STATE } from '../constants';
 
 interface CoreGameState {
@@ -11,7 +11,7 @@ interface CoreGameState {
   aiLoadingStatus: LoadingStatus;
 
   // Battle history (could be moved to battle store later)
-  battleHistory: any[];
+  battleHistory: BattleRecord[];
 
   // General flags
   hasAttemptedInitialLoad: boolean;
@@ -57,7 +57,7 @@ export const useGameStore = create<GameStore>(set => ({
   setAILoadingStatus: (status: LoadingStatus) =>
     set({ aiLoadingStatus: status }),
 
-  addBattleToHistory: (battle: any) =>
+  addBattleToHistory: (battle: BattleRecord) =>
     set(state => ({
       battleHistory: [...state.battleHistory, battle],
     })),
