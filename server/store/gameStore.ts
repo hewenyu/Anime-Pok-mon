@@ -23,7 +23,7 @@ interface GameStore extends CoreGameState {
   setCurrentGameTime: (time: number) => void;
   advanceGameTime: (options: { minutes?: number; hours?: number }) => void;
   setAILoadingStatus: (status: LoadingStatus) => void;
-  addBattleToHistory: (battle: any) => void;
+  addBattleToHistory: (battle: BattleRecord) => void;
   setHasAttemptedInitialLoad: (attempted: boolean) => void;
   updateGameState: (updater: (state: GameState) => Partial<GameState>) => void;
   resetGameState: () => void;

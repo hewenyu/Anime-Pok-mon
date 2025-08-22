@@ -10,6 +10,7 @@ import {
   LoadingStatus,
   AICustomizationScreenActionTag,
   Pokemon,
+  BattleTrigger,
 } from '../types';
 import {
   STORY_DATA,
@@ -42,7 +43,15 @@ export const useStoryEngine = (
   updateGameState: UpdateGameStateFunction,
   processAIEvent: ProcessAIEventFunction,
   setGameMode: (mode: GameMode) => void,
-  startBattle: (battleDetails: any) => void
+  startBattle: (
+    battleDetails:
+      | BattleTrigger
+      | Partial<{
+          enemyPokemon: Pokemon;
+          battleReturnSegmentWin: string;
+          battleReturnSegmentLose: string;
+        }>
+  ) => void
 ) => {
   const [currentStaticSegmentId, setCurrentStaticSegmentId] = useState<string>(
     'INITIAL_PROFILE_PREPARATION'

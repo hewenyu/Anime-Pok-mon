@@ -65,7 +65,7 @@ interface CustomizeRandomStartScreenProps {
             | 'currentObjective'
             | 'currentLocationDescription'
             | 'money';
-          value: any;
+          value: string | number | undefined;
         }
       | UserDateTimeInput
   ) => void;
@@ -558,7 +558,7 @@ const CustomizeRandomStartScreen: React.FC<CustomizeRandomStartScreenProps> = ({
         onUpdateCustomizationDirectly('itemRemove', i.id)
       );
       onUpdateCustomizationDirectly('profileFieldUpdate', {
-        field: 'money' as any,
+        field: 'money',
         value: 0,
       });
 
@@ -635,7 +635,7 @@ const CustomizeRandomStartScreen: React.FC<CustomizeRandomStartScreenProps> = ({
         if (data.objective !== undefined) {
           setEditableObjective(data.objective);
           onUpdateCustomizationDirectly('profileFieldUpdate', {
-            field: 'currentObjective' as any,
+            field: 'currentObjective',
             value: data.objective,
           });
           profileUpdateMessages.push(`目标: ${data.objective}`);
@@ -643,7 +643,7 @@ const CustomizeRandomStartScreen: React.FC<CustomizeRandomStartScreenProps> = ({
         if (data.location !== undefined) {
           setEditableLocation(data.location);
           onUpdateCustomizationDirectly('profileFieldUpdate', {
-            field: 'currentLocationDescription' as any,
+            field: 'currentLocationDescription',
             value: data.location,
           });
           profileUpdateMessages.push(`地点: ${data.location}`);
@@ -651,7 +651,7 @@ const CustomizeRandomStartScreen: React.FC<CustomizeRandomStartScreenProps> = ({
         if (data.money !== undefined) {
           setEditableMoney(data.money);
           onUpdateCustomizationDirectly('profileFieldUpdate', {
-            field: 'money' as any,
+            field: 'money',
             value: data.money,
           });
           profileUpdateMessages.push(`金钱: ${data.money}`);
@@ -774,7 +774,7 @@ const CustomizeRandomStartScreen: React.FC<CustomizeRandomStartScreenProps> = ({
       if (!isNaN(amount) && amount >= 0) {
         setEditableMoney(amount);
         onUpdateCustomizationDirectly('profileFieldUpdate', {
-          field: 'money' as any,
+          field: 'money',
           value: amount,
         });
         systemMessageText = `初始金钱已更新为 ${amount}。`;
@@ -789,7 +789,7 @@ const CustomizeRandomStartScreen: React.FC<CustomizeRandomStartScreenProps> = ({
       );
       setEditableLocation(locationName);
       onUpdateCustomizationDirectly('profileFieldUpdate', {
-        field: 'currentLocationDescription' as any,
+        field: 'currentLocationDescription',
         value: locationName,
       });
       systemMessageText = `初始位置已更新为 "${locationName}"。`;
@@ -806,7 +806,7 @@ const CustomizeRandomStartScreen: React.FC<CustomizeRandomStartScreenProps> = ({
       );
       setEditableObjective(objectiveText);
       onUpdateCustomizationDirectly('profileFieldUpdate', {
-        field: 'currentObjective' as any,
+        field: 'currentObjective',
         value: objectiveText,
       });
       systemMessageText = `初始目标已更新为 "${objectiveText}"。`;

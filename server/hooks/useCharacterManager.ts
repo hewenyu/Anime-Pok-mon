@@ -179,7 +179,7 @@ export const useCharacterManager = (
               | 'currentObjective'
               | 'currentLocationDescription'
               | 'money';
-            value: any;
+            value: string | number | undefined;
           }
         | UserDateTimeInput
     ) => {
@@ -240,7 +240,7 @@ export const useCharacterManager = (
                   | 'currentObjective'
                   | 'currentLocationDescription'
                   | 'money';
-                value: any;
+                value: string | number | undefined;
               };
             const playerProfileKeys = [
               'name',
