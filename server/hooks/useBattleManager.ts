@@ -8,6 +8,7 @@ import {
   BattleRecord,
   BattleChatMessage,
   AIEventTrigger,
+  BattleTrigger,
 } from '../types';
 import { STORY_DATA } from '../constants';
 import { sanitizePokemonData } from '../utils/dataSanitizers';
@@ -27,10 +28,28 @@ export const useBattleManager = (
   triggerAIStory: TriggerAIStoryFunction
 ) => {
   const startBattle = useCallback(
-    (battleDetails: any) => {
+    (
+      battleDetails:
+        | BattleTrigger
+        | Partial<{
+            enemyPokemon: Pokemon;
+            battleReturnSegmentWin: string;
+            battleReturnSegmentLose: string;
+          }> = {}
+    ) => {
       updateGameState(prev => {
-        const details = battleDetails.enemyPokemon
-          ? battleDetails
+        // Handle BattleTrigger type conversion
+        const normalizedDetails =
+          'winSegmentId' in battleDetails
+            ? {
+                enemyPokemon: battleDetails.enemyPokemon,
+                battleReturnSegmentWin: battleDetails.winSegmentId,
+                battleReturnSegmentLose: battleDetails.loseSegmentId,
+              }
+            : battleDetails;
+
+        const details = normalizedDetails.enemyPokemon
+          ? normalizedDetails
           : prev.pendingBattleDetails;
 
         if (details && details.enemyPokemon) {

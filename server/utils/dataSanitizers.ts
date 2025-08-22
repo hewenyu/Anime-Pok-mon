@@ -181,7 +181,10 @@ export const sanitizeItemData = (
   if (typeof aiItem.description === 'string') {
     finalDescription = aiItem.description;
   } else if (aiItem.description && typeof aiItem.description === 'object') {
-    const descObj = aiItem.description as any;
+    const descObj = aiItem.description as {
+      description?: string;
+      name?: string;
+    };
     if (typeof descObj.description === 'string') {
       finalDescription = descObj.description;
     } else if (typeof descObj.name === 'string') {

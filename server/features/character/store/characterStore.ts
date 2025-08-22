@@ -4,6 +4,7 @@ import {
   Pokemon,
   InventoryItem,
   LoadingStatus,
+  AIStoryResponse,
 } from '../../../types';
 
 interface CharacterState {
@@ -16,7 +17,7 @@ interface CharacterState {
   money: number;
 
   // Customization state
-  customizationAssistantResponse: any;
+  customizationAssistantResponse: AIStoryResponse | null;
   aiSuggestedGameStartTime: number | null;
   initialProfileGenerated: boolean;
 
@@ -50,7 +51,7 @@ interface CharacterActions {
   spendMoney: (amount: number) => boolean; // Returns true if successful
 
   // Customization
-  setCustomizationAssistantResponse: (response: any) => void;
+  setCustomizationAssistantResponse: (response: AIStoryResponse | null) => void;
   setAISuggestedGameStartTime: (time: number | null) => void;
   setInitialProfileGenerated: (generated: boolean) => void;
 
@@ -66,10 +67,12 @@ const initialCharacterState: CharacterState = {
     name: '',
     description: '',
     age: 16,
-    hometown: '',
-    goals: '',
-    appearance: '',
-    personality: '',
+    gender: '男',
+    stamina: 100,
+    maxStamina: 100,
+    energy: 100,
+    maxEnergy: 100,
+    healthStatus: '健康',
   },
   playerTeam: [],
   inventory: [],

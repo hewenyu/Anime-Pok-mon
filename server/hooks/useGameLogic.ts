@@ -4,6 +4,8 @@ import {
   GameMode,
   AIEventTrigger,
   AICustomizationScreenActionTag,
+  BattleTrigger,
+  Pokemon,
 } from '../types';
 import { INITIAL_GAME_STATE } from '../constants';
 import { useSaveManager } from './useSaveManager';
@@ -117,7 +119,15 @@ export const useGameLogic = () => {
     );
   }
 
-  function startBattleWrapper(battleDetails: any) {
+  function startBattleWrapper(
+    battleDetails:
+      | BattleTrigger
+      | Partial<{
+          enemyPokemon: Pokemon;
+          battleReturnSegmentWin: string;
+          battleReturnSegmentLose: string;
+        }> = {}
+  ) {
     return battleManager.startBattle(battleDetails);
   }
 
