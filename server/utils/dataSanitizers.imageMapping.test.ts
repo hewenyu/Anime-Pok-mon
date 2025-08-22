@@ -14,7 +14,7 @@ describe('dataSanitizers with image caching', () => {
       };
 
       const result = sanitizePokemonData(inputPokemon);
-      
+
       expect(result.name).toBe('皮卡丘');
       expect(result.imageUrl).toBe('/images/pokemon/25.png');
     });
@@ -26,11 +26,12 @@ describe('dataSanitizers with image caching', () => {
         maxHp: 50,
         currentHp: 50,
         types: ['草'],
-        imageUrl: 'https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/1.png',
+        imageUrl:
+          'https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/1.png',
       };
 
       const result = sanitizePokemonData(inputPokemon);
-      
+
       expect(result.name).toBe('妙蛙种子');
       expect(result.imageUrl).toBe('/images/pokemon/1.png');
     });
@@ -42,13 +43,16 @@ describe('dataSanitizers with image caching', () => {
         maxHp: 60,
         currentHp: 60,
         types: ['普通'],
-        imageUrl: 'https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/2000.png',
+        imageUrl:
+          'https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/2000.png',
       };
 
       const result = sanitizePokemonData(inputPokemon);
-      
+
       expect(result.name).toBe('未知宝可梦');
-      expect(result.imageUrl).toBe('https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/2000.png');
+      expect(result.imageUrl).toBe(
+        'https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/2000.png'
+      );
     });
 
     it('should fallback to placeholder for Pokemon without external URL', () => {
@@ -62,7 +66,7 @@ describe('dataSanitizers with image caching', () => {
       };
 
       const result = sanitizePokemonData(inputPokemon);
-      
+
       expect(result.name).toBe('神秘宝可梦');
       expect(result.imageUrl).toMatch(/placehold\.co/);
     });
@@ -78,7 +82,7 @@ describe('dataSanitizers with image caching', () => {
       };
 
       const result = sanitizeItemData(inputItem);
-      
+
       expect(result.name).toBe('精灵球');
       expect(result.imageUrl).toBe('/images/items/poke-ball.png');
     });
@@ -88,11 +92,12 @@ describe('dataSanitizers with image caching', () => {
         name: '伤药',
         quantity: 3,
         description: '恢复HP的药物',
-        imageUrl: 'https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/items/potion.png',
+        imageUrl:
+          'https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/items/potion.png',
       };
 
       const result = sanitizeItemData(inputItem);
-      
+
       expect(result.name).toBe('伤药');
       expect(result.imageUrl).toBe('/images/items/potion.png');
     });
@@ -102,13 +107,16 @@ describe('dataSanitizers with image caching', () => {
         name: '神秘道具',
         quantity: 1,
         description: '未知效果的道具',
-        imageUrl: 'https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/items/mystery-item.png',
+        imageUrl:
+          'https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/items/mystery-item.png',
       };
 
       const result = sanitizeItemData(inputItem);
-      
+
       expect(result.name).toBe('神秘道具');
-      expect(result.imageUrl).toBe('https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/items/mystery-item.png');
+      expect(result.imageUrl).toBe(
+        'https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/items/mystery-item.png'
+      );
     });
 
     it('should fallback to placeholder for items without external URL', () => {
@@ -120,7 +128,7 @@ describe('dataSanitizers with image caching', () => {
       };
 
       const result = sanitizeItemData(inputItem);
-      
+
       expect(result.name).toBe('特殊道具');
       expect(result.imageUrl).toMatch(/placehold\.co/);
     });
